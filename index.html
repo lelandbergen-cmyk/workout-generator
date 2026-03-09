@@ -20,7 +20,7 @@
 --eq-kettlebell:#d4a017;--eq-dumbbell:#2dd4bf;--eq-barbell:#ef4444;
 --eq-bodyweight:#22c55e;--eq-band:#ec4899;--eq-cable:#3b82f6;
 --eq-trx:#10b981;--eq-plyobox:#f97316;--eq-medball:#a855f7;
---eq-landmine:#d946ef;--eq-sled:#eab308;--eq-trapbar:#6366f1;
+--eq-landmine:#d946ef;--eq-sled:#eab308;--eq-trapbar:#6366f1;--eq-plate:#f59e0b;
 }
 html{font-size:14px}
 body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;overflow:hidden;height:100vh}
@@ -73,6 +73,8 @@ display:flex;flex-direction:column;background:var(--surface)}
 border:1px solid var(--border);background:var(--surface2);transition:all .15s;white-space:nowrap}
 .chip.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
 .chip .cnt{font-family:'DM Mono',monospace;font-size:.65rem;margin-left:3px;opacity:.7}
+.chip-add{border-style:dashed!important;color:var(--accent)!important;opacity:.7;transition:all .15s}
+.chip-add:hover{opacity:1;border-color:var(--accent)!important;background:var(--accent-dim)!important}
 #filters2{padding:4px 12px 8px;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:4px}
 #mvlist{flex:1;overflow-y:auto;padding:8px}
 .mv-card{padding:8px 12px;border-radius:var(--radius);cursor:grab;transition:background .15s;
@@ -98,6 +100,7 @@ font-weight:700;margin-right:6px;text-transform:uppercase;letter-spacing:.5px}
 .eq-landmine{background:rgba(217,70,239,.2);color:#d946ef}
 .eq-sled{background:rgba(234,179,8,.2);color:#eab308}
 .eq-trapbar{background:rgba(99,102,241,.2);color:#6366f1}
+.eq-plate{background:rgba(245,158,11,.2);color:#f59e0b}
 
 /* BUILDER */
 .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
@@ -511,7 +514,9 @@ html{font-size:12px}
 <input type="text" id="cm-name" placeholder="e.g. Banded Nordic Curl" style="width:100%"></div>
 <div class="field"><label>Equipment</label>
 <select id="cm-equipment" style="width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius)">
-</select></div>
+</select>
+<input type="text" id="cm-new-eq" placeholder="New equipment name..." style="width:100%;margin-top:6px;display:none">
+</div>
 <div class="field"><label>Category</label>
 <select id="cm-category" style="width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius)">
 </select></div>
@@ -1298,7 +1303,37 @@ const BASE=[
 {movement:"Trap Bar Jump Squat",equipment:"Trap Bar",category:"Conditioning",explanation:"Light load, squat and jump explosively. Land softly, reset, repeat.",rating:4,primary:"Legs"},
 {movement:"Trap Bar Row",equipment:"Trap Bar",category:"Pull / Upper",explanation:"Hinge forward, row trap bar to hips. Neutral grip is easy on wrists.",rating:3,primary:"Back"},
 {movement:"Trap Bar Floor Press",equipment:"Trap Bar",category:"Push / Upper",explanation:"Lie inside trap bar, press from floor. Neutral grip, shorter range of motion.",rating:3,primary:"Chest"},
-{movement:"Trap Bar Split Squat",equipment:"Trap Bar",category:"Squat / Lower",explanation:"Step one foot forward inside trap bar, lunge down. Neutral grip loading.",rating:4,primary:"Quads"}
+{movement:"Trap Bar Split Squat",equipment:"Trap Bar",category:"Squat / Lower",explanation:"Step one foot forward inside trap bar, lunge down. Neutral grip loading.",rating:4,primary:"Quads"},
+{movement:"Plate Ground to Overhead",equipment:"Plate",category:"Conditioning",explanation:"Pick the plate off the floor, hinge up and press it overhead in one fluid motion. Full body power and coordination.",rating:5,primary:"Full Body"},
+{movement:"Plate Russian Twist",equipment:"Plate",category:"Carry / Core",explanation:"Seated with feet off the floor, hold the plate and rotate side to side. Control the twist, tap each side.",rating:4,primary:"Obliques"},
+{movement:"Plate Sit Up",equipment:"Plate",category:"Carry / Core",explanation:"Hold plate at chest or overhead, perform a full sit up. The load increases core demand significantly.",rating:4,primary:"Core"},
+{movement:"Plate Overhead Lunge",equipment:"Plate",category:"Squat / Lower",explanation:"Lock the plate out overhead and step into lunges. Challenges shoulder stability and balance under load.",rating:4,primary:"Quads"},
+{movement:"Plate Squat",equipment:"Plate",category:"Squat / Lower",explanation:"Hold plate at chest goblet-style, squat deep. Drive through heels to stand. Great for high-rep conditioning.",rating:4,primary:"Quads"},
+{movement:"Plate Overhead Press",equipment:"Plate",category:"Push / Upper",explanation:"Hold plate at chest level, press overhead to full lockout. Grip the edges, control the descent.",rating:3,primary:"Shoulders"},
+{movement:"Plate Front Raise",equipment:"Plate",category:"Push / Upper",explanation:"Hold plate with both hands at hips, raise straight out to shoulder height. Control the lower.",rating:3,primary:"Shoulders"},
+{movement:"Plate Halo",equipment:"Plate",category:"Carry / Core",explanation:"Circle the plate around your head keeping elbows tight. Slow and controlled, great for shoulder mobility and core.",rating:3,primary:"Shoulders"},
+{movement:"Plate Thruster",equipment:"Plate",category:"Conditioning",explanation:"Squat with plate at chest, drive up pressing it overhead. Use leg drive to power the press. High output move.",rating:5,primary:"Full Body"},
+{movement:"Plate Overhead Carry",equipment:"Plate",category:"Carry / Core",explanation:"Lock the plate overhead and walk with tall posture. Core and shoulders stay engaged the entire time.",rating:4,primary:"Core"},
+{movement:"Plate Farmer Carry",equipment:"Plate",category:"Carry / Core",explanation:"Pinch-grip plates at your sides and walk. Brutal grip challenge with core and postural demand.",rating:4,primary:"Grip"},
+{movement:"Plate Push Up",equipment:"Plate",category:"Push / Upper",explanation:"Hands on plate for deficit or plate on back for load. Either variation increases push up difficulty.",rating:3,primary:"Chest"},
+{movement:"Plate Lateral Raise",equipment:"Plate",category:"Push / Upper",explanation:"Hold a plate in each hand, raise laterally to shoulder height. Control the descent for time under tension.",rating:3,primary:"Shoulders"},
+{movement:"Plate Bent Over Row",equipment:"Plate",category:"Pull / Upper",explanation:"Hinge forward, grip plate edges, row to lower chest. Squeeze shoulder blades at the top.",rating:3,primary:"Back"},
+{movement:"Plate Reverse Lunge",equipment:"Plate",category:"Squat / Lower",explanation:"Hold plate at chest, step backward into a deep lunge. Drive through front heel to return to standing.",rating:4,primary:"Quads"},
+{movement:"Plate Swing",equipment:"Plate",category:"Conditioning",explanation:"Grip plate edges, swing between legs with a hip hinge then drive forward to chest height. Similar to KB swing pattern.",rating:4,primary:"Glutes"},
+{movement:"Plate Burpee",equipment:"Plate",category:"Conditioning",explanation:"Hold plate, squat down, kick back to plank, chest to floor, stand and press overhead. Full body crusher.",rating:5,primary:"Full Body"},
+{movement:"Plate Deadlift",equipment:"Plate",category:"Squat / Lower",explanation:"Stand on platform or hold plate between legs, hinge and lift. Great for high-rep posterior chain work.",rating:3,primary:"Hamstrings"},
+{movement:"Plate Curl",equipment:"Plate",category:"Pull / Upper",explanation:"Grip plate edges with both hands, curl to chest. Constant grip tension makes this harder than it looks.",rating:3,primary:"Biceps"},
+{movement:"Plate Tricep Extension",equipment:"Plate",category:"Push / Upper",explanation:"Hold plate overhead, lower behind head by bending elbows. Extend back to lockout. Keep elbows tight.",rating:3,primary:"Triceps"},
+{movement:"Plate Woodchop",equipment:"Plate",category:"Carry / Core",explanation:"Hold plate, rotate from high to low in a diagonal chop pattern. Power from hips, control through core.",rating:4,primary:"Obliques"},
+{movement:"Plate Lateral Lunge",equipment:"Plate",category:"Squat / Lower",explanation:"Hold plate at chest, step out to the side into a wide lunge. Push back to center through the working leg.",rating:3,primary:"Adductors"},
+{movement:"Plate V-Up",equipment:"Plate",category:"Carry / Core",explanation:"Lie flat holding plate overhead, fold body into a V bringing plate to feet. Control the descent.",rating:4,primary:"Core"},
+{movement:"Plate Bear Crawl",equipment:"Plate",category:"Conditioning",explanation:"Place plate on back or push it along the floor while bear crawling. Extreme core and shoulder demand.",rating:4,primary:"Full Body"},
+{movement:"Plate Step Up",equipment:"Plate",category:"Squat / Lower",explanation:"Hold plate at chest, step onto box. Drive through heel to full extension at the top.",rating:3,primary:"Quads"},
+{movement:"Plate Hip Thrust",equipment:"Plate",category:"Squat / Lower",explanation:"Plate across hips, upper back on bench. Drive hips up squeezing glutes hard at the top.",rating:4,primary:"Glutes"},
+{movement:"Plate Overhead Squat",equipment:"Plate",category:"Squat / Lower",explanation:"Lock plate overhead with straight arms, squat deep. Demands ankle, hip, and shoulder mobility.",rating:5,primary:"Full Body"},
+{movement:"Plate Bus Driver",equipment:"Plate",category:"Carry / Core",explanation:"Hold plate straight out at shoulder height, rotate like a steering wheel side to side. Shoulder endurance burner.",rating:3,primary:"Shoulders"},
+{movement:"Plate Pinch Carry",equipment:"Plate",category:"Carry / Core",explanation:"Pinch two plates together smooth-side-out and walk. Ultimate grip strength challenge.",rating:4,primary:"Grip"},
+{movement:"Plate Toe Touch",equipment:"Plate",category:"Carry / Core",explanation:"Lie on back holding plate, raise legs and plate to meet at the top. Lower both with control. Core stability.",rating:3,primary:"Core"}
 ];
 
 // === HELPERS ===
@@ -1307,21 +1342,41 @@ function $(sel){return document.querySelector(sel)}
 function $$(sel){return document.querySelectorAll(sel)}
 function uid(){return 'c'+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4)}
 
-const EQ_LIST=['Kettlebell','Dumbbell','Barbell','Bodyweight','Band','Cable','TRX','Plyo Box','Med Ball','Landmine','Sled','Trap Bar'];
+const EQ_LIST=['Kettlebell','Dumbbell','Barbell','Bodyweight','Band','Cable','TRX','Plyo Box','Med Ball','Landmine','Sled','Trap Bar','Plate'];
 const CAT_LIST=['Squat / Lower','Push / Upper','Pull / Upper','Carry / Core','Conditioning'];
 
 function eqClass(eq){
 const m={'Kettlebell':'kettlebell','Dumbbell':'dumbbell','Barbell':'barbell','Bodyweight':'bodyweight',
 'Band':'band','Cable':'cable','TRX':'trx','Plyo Box':'plyobox','Med Ball':'medball',
-'Landmine':'landmine','Sled':'sled','Trap Bar':'trapbar'};
-return 'eq-'+(m[eq]||'bodyweight');
+'Landmine':'landmine','Sled':'sled','Trap Bar':'trapbar','Plate':'plate'};
+return 'eq-'+(m[eq]||eq.toLowerCase().replace(/[^a-z]/g,''));
+}
+
+// Dynamic equipment colors for custom types
+const CUSTOM_EQ_COLORS=['#06b6d4','#14b8a6','#84cc16','#f472b6','#c084fc','#fb923c','#38bdf8','#a3e635'];
+function ensureEqStyle(eq){
+const cls=eqClass(eq);
+if(document.querySelector('.'+cls))return;
+const idx=customEquipment.length%CUSTOM_EQ_COLORS.length;
+const col=CUSTOM_EQ_COLORS[idx];
+const style=document.createElement('style');
+style.textContent='.'+cls+'{background:'+col+'33;color:'+col+'}';
+document.head.appendChild(style);
 }
 
 // === STATE ===
 let movements=[...BASE];
 let customs=JSON.parse(localStorage.getItem('wg_custom_v1')||'[]');
+let customEquipment=JSON.parse(localStorage.getItem('wg_custom_eq_v1')||'[]');
 let videoOverrides=JSON.parse(localStorage.getItem('wg_video_overrides_v1')||'{}');
 let descOverrides=JSON.parse(localStorage.getItem('wg_desc_overrides_v1')||'{}');
+
+function allEquipment(){
+const set=new Set([...EQ_LIST,...customEquipment]);
+// Also pick up any equipment from movements not in the list
+movements.forEach(m=>{if(m.equipment)set.add(m.equipment)});
+return [...set];
+}
 let savedWorkouts=JSON.parse(localStorage.getItem('wg_saved_workouts_v1')||'[]');
 movements=movements.concat(customs);
 // Apply saved description overrides
@@ -1337,7 +1392,7 @@ let circuits=[];
 let repMode='single'; // 'single' or 'range'
 let currentDetailMv=null;
 let dragData=null;
-let lastGenEqs=[...EQ_LIST]; // remember equipment filters from last generate
+let lastGenEqs=null; // populated on first generate, uses allEquipment() as default
 
 // === TEMPLATES ===
 const TEMPLATES=[
@@ -1361,14 +1416,32 @@ renderCircuits();
 
 // === FILTERS ===
 function buildFilters(){
+const eqAll=allEquipment();
+eqAll.forEach(eq=>ensureEqStyle(eq));
 const f1=$('#filters');
 let html='<span class="chip active" data-filter="all">All <span class="cnt">'+movements.length+'</span></span>';
-EQ_LIST.forEach(eq=>{
+eqAll.forEach(eq=>{
 const cnt=movements.filter(m=>m.equipment===eq).length;
-html+='<span class="chip" data-filter="'+esc(eq)+'">'+esc(eq)+' <span class="cnt">'+cnt+'</span></span>';
+const isCustomEq=customEquipment.includes(eq);
+if(cnt>0||isCustomEq)html+='<span class="chip" data-filter="'+esc(eq)+'">'+esc(eq)+' <span class="cnt">'+cnt+'</span></span>';
 });
 html+='<span class="chip" data-filter="custom">Custom <span class="cnt">'+customs.length+'</span></span>';
+html+='<span class="chip chip-add" id="chip-add-eq">+ New</span>';
 f1.innerHTML=html;
+// Wire add-equipment chip
+$('#chip-add-eq').addEventListener('click',function(e){
+e.stopPropagation();
+const name=prompt('New equipment name:');
+if(!name||!name.trim())return;
+const eq=name.trim();
+if(allEquipment().find(e=>e.toLowerCase()===eq.toLowerCase())){alert('Equipment "'+eq+'" already exists.');return}
+if(!customEquipment.includes(eq)){
+customEquipment.push(eq);
+localStorage.setItem('wg_custom_eq_v1',JSON.stringify(customEquipment));
+ensureEqStyle(eq);
+buildFilters();filterMvs();
+}
+});
 
 const f2=$('#filters2');
 let html2='<span class="chip active" data-eqfilter="all">All</span>';
@@ -1541,23 +1614,39 @@ $('#btn-templates').addEventListener('click',openTemplates);
 
 // Custom movement modal
 $('#btn-add-custom').addEventListener('click',function(){
-$('#cm-name').value='';$('#cm-primary').value='';$('#cm-desc').value='';
+$('#cm-name').value='';$('#cm-primary').value='';$('#cm-desc').value='';$('#cm-new-eq').value='';
+$('#cm-new-eq').style.display='none';
 $('#cm-error').style.display='none';
 // Populate selects
 const eqSel=$('#cm-equipment');
 eqSel.innerHTML='';
-EQ_LIST.forEach(eq=>{const o=document.createElement('option');o.value=eq;o.textContent=eq;eqSel.appendChild(o)});
+allEquipment().forEach(eq=>{const o=document.createElement('option');o.value=eq;o.textContent=eq;eqSel.appendChild(o)});
+const addOpt=document.createElement('option');addOpt.value='__new__';addOpt.textContent='+ Add new equipment...';eqSel.appendChild(addOpt);
 const catSel=$('#cm-category');
 catSel.innerHTML='';
 CAT_LIST.forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)});
 $('#modal-custom').classList.add('open');
+});
+$('#cm-equipment').addEventListener('change',function(){
+$('#cm-new-eq').style.display=this.value==='__new__'?'':'none';
+if(this.value==='__new__')$('#cm-new-eq').focus();
 });
 $('#cm-save').addEventListener('click',function(){
 const name=$('#cm-name').value.trim();
 if(!name){$('#cm-error').textContent='Name is required.';$('#cm-error').style.display='block';return}
 if(movements.find(m=>m.movement.toLowerCase()===name.toLowerCase())){
 $('#cm-error').textContent='A movement with that name already exists.';$('#cm-error').style.display='block';return}
-const mv={movement:name,equipment:$('#cm-equipment').value,category:$('#cm-category').value,
+let eq=$('#cm-equipment').value;
+if(eq==='__new__'){
+eq=$('#cm-new-eq').value.trim();
+if(!eq){$('#cm-error').textContent='Enter a name for the new equipment.';$('#cm-error').style.display='block';return}
+if(!customEquipment.includes(eq)){
+customEquipment.push(eq);
+localStorage.setItem('wg_custom_eq_v1',JSON.stringify(customEquipment));
+ensureEqStyle(eq);
+}
+}
+const mv={movement:name,equipment:eq,category:$('#cm-category').value,
 explanation:$('#cm-desc').value.trim()||'',rating:0,primary:$('#cm-primary').value.trim(),_custom:true};
 movements.push(mv);
 customs.push(mv);
@@ -1976,7 +2065,7 @@ dragData=null;renderCircuits();
 
 function smartPick(ci,excludeMovement){
 // Build pool from last generate equipment filters
-let pool=movements.filter(m=>lastGenEqs.includes(m.equipment));
+let pool=movements.filter(m=>(lastGenEqs||allEquipment()).includes(m.equipment));
 if(!pool.length)pool=[...movements];
 
 // Gather all movements currently in the workout
@@ -2144,9 +2233,10 @@ function openGenerate(){
 // Equipment grid
 const grid=$('#gen-eq');
 let html='';
-EQ_LIST.forEach(eq=>{
+const eqAll=allEquipment();
+eqAll.forEach(eq=>{
 const cnt=movements.filter(m=>m.equipment===eq).length;
-html+='<label class="gen-eq-item active"><input type="checkbox" value="'+esc(eq)+'" checked> '+esc(eq)+' <span class="cnt">('+cnt+')</span></label>';
+if(cnt>0)html+='<label class="gen-eq-item active"><input type="checkbox" value="'+esc(eq)+'" checked> '+esc(eq)+' <span class="cnt">('+cnt+')</span></label>';
 });
 grid.innerHTML=html;
 grid.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
@@ -2278,7 +2368,7 @@ $('#gen-timing-preview').textContent=preview;
 function getGenFilters(){
 const eqs=[];
 $$('#gen-eq input:checked').forEach(cb=>eqs.push(cb.value));
-lastGenEqs=eqs.length?[...eqs]:[...EQ_LIST]; // remember for smart picks
+lastGenEqs=eqs.length?[...eqs]:allEquipment(); // remember for smart picks
 const focus=$('#gen-focus').value;
 const numCircuits=parseInt($('#gen-circuits').value)||3;
 const exPer=parseInt($('#gen-exper').value)||4;
