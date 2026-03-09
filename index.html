@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workout Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WOD Architect">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0a' width='100' height='100' rx='20'/><text y='68' x='50' text-anchor='middle' font-size='50'>⚡</text></svg>">
+<title>Workout Architect</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -118,11 +123,17 @@ border:1px solid transparent;color:var(--text);padding:4px 6px}
 .circuit-header .circuit-actions{display:flex;gap:4px}
 .override-badge{font-family:'DM Mono',monospace;font-size:.7rem;background:var(--accent-dim);
 color:var(--accent);padding:2px 8px;border-radius:4px;font-weight:600}
-.override-row{padding:8px 16px;background:rgba(255,209,0,.03);border-bottom:1px solid var(--border);
-display:none;gap:12px;align-items:center}
+.override-row{padding:10px 16px;background:rgba(255,209,0,.03);border-bottom:1px solid var(--border);
+display:none;flex-direction:column;gap:8px}
 .override-row.active{display:flex}
 .override-row label{font-size:.75rem;color:var(--muted)}
 .override-row input{width:55px}
+.override-timing-chips{display:flex;gap:4px;flex-wrap:wrap}
+.override-timing-chips .otc{padding:3px 9px;border-radius:12px;font-size:.68rem;font-weight:600;
+cursor:pointer;border:1px solid var(--border);background:var(--surface2);transition:all .15s}
+.override-timing-chips .otc.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.override-fields{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.override-preview{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);margin-top:2px}
 .ex-list{min-height:40px;padding:4px 8px}
 .ex-row{display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius);
 margin-bottom:2px;transition:all .15s;border:1px solid transparent}
@@ -257,12 +268,69 @@ input{border:none!important;background:transparent!important}
 /* Rep mode */
 .rep-mode-indicator{font-family:'DM Mono',monospace;font-size:.7rem;padding:2px 6px;
 border-radius:4px;background:var(--surface3);color:var(--muted)}
+
+/* MOBILE */
+@media(max-width:768px){
+html{font-size:13px}
+#sidebar-toggle{display:block!important}
+#header h1{font-size:1rem;letter-spacing:2px}
+#header{padding:10px 12px;height:48px}
+#nav button{padding:5px 10px;font-size:.75rem}
+
+#app{flex-direction:column;height:calc(100vh - 48px)}
+#sidebar{position:fixed;top:48px;left:0;bottom:0;width:85vw;max-width:340px;z-index:500;
+transform:translateX(-100%);transition:transform .25s ease;border-right:1px solid var(--border)}
+#sidebar.open{transform:translateX(0)}
+#sidebar-overlay{display:none;position:fixed;inset:0;top:48px;background:rgba(0,0,0,.5);z-index:499}
+#sidebar-overlay.open{display:block}
+
+#main,#saved-panel{padding:12px}
+#workout-name{font-size:1rem}
+.settings-row{gap:8px}
+.settings-row label{font-size:.72rem}
+input[type="number"]{width:50px}
+
+.circuit-header{flex-wrap:wrap;padding:10px 12px}
+.circuit-header input{font-size:.82rem;min-width:0}
+.ex-row{flex-wrap:wrap;gap:4px;padding:6px 8px}
+.ex-row .ex-info{flex:1 1 100%;min-width:0}
+.ex-row .ex-info .ex-mv-name{font-size:.78rem}
+.ex-row input[type="number"],.ex-row input[type="text"]{width:40px;padding:2px 3px;font-size:.72rem}
+.ex-row .ex-notes{width:60px}
+.ex-row .ex-rest-input{width:36px}
+
+.modal{max-width:95vw;padding:16px;max-height:90vh}
+.modal h2{font-size:1rem}
+.gen-eq-grid{grid-template-columns:repeat(2,1fr)}
+#gen-formats{grid-template-columns:repeat(2,1fr)!important}
+
+#filters,#filters2{gap:3px;padding:6px 10px}
+.chip{font-size:.65rem;padding:2px 7px}
+.mv-card{padding:6px 10px}
+.mv-card .mv-name{font-size:.78rem}
+.mv-card .eq-tag{font-size:.58rem}
+
+.section-card{padding:12px}
+.section-title{font-size:.88rem}
+.saved-card{padding:12px}
+
+/* Safe area for notch phones */
+#header{padding-top:max(10px,env(safe-area-inset-top))}
+#sidebar{top:max(48px,calc(48px + env(safe-area-inset-top)))}
+}
+@media(max-width:380px){
+html{font-size:12px}
+.gen-eq-grid{grid-template-columns:1fr 1fr}
+.settings-row{flex-direction:column;align-items:stretch}
+.settings-row label{flex-direction:row;justify-content:space-between}
+}
 </style>
 </head>
 <body>
 
 <div id="header">
-<h1><span class="y">WORKOUT</span> GENERATOR</h1>
+<button id="sidebar-toggle" class="btn" style="display:none;font-size:1.2rem;padding:4px 8px">☰</button>
+<h1><span class="y">WORKOUT</span> ARCHITECT</h1>
 <div id="nav">
 <button class="active" data-tab="builder">Builder</button>
 <button data-tab="saved">Saved <span class="badge" id="saved-count" style="display:none">0</span></button>
@@ -270,10 +338,14 @@ border-radius:4px;background:var(--surface3);color:var(--muted)}
 </div>
 
 <div id="app">
+<div id="sidebar-overlay"></div>
 <!-- SIDEBAR: Movement Library -->
 <div id="sidebar">
 <div id="search-box">
-<input type="search" id="mv-search" placeholder="Search movements...">
+<div style="display:flex;gap:6px">
+<input type="search" id="mv-search" placeholder="Search movements..." style="flex:1">
+<button class="btn btn-accent btn-sm" id="btn-add-custom" title="Add custom movement">+</button>
+</div>
 </div>
 <div id="filters"></div>
 <div id="filters2"></div>
@@ -371,7 +443,10 @@ border-radius:4px;background:var(--surface3);color:var(--muted)}
 <div id="gen-format-desc" style="font-size:.78rem;color:var(--accent);padding:8px 12px;background:var(--accent-dim);border-radius:var(--radius);line-height:1.4"></div>
 </div>
 
-<div class="field"><label>Equipment</label><div class="gen-eq-grid" id="gen-eq"></div></div>
+<div class="field"><label>Equipment <span style="float:right;display:flex;gap:4px">
+<button class="btn btn-outline btn-sm" id="gen-eq-all" style="padding:2px 8px;font-size:.68rem">All</button>
+<button class="btn btn-outline btn-sm" id="gen-eq-none" style="padding:2px 8px;font-size:.68rem">None</button>
+</span></label><div class="gen-eq-grid" id="gen-eq"></div></div>
 
 <div class="field">
 <label>Focus</label>
@@ -425,6 +500,29 @@ border-radius:4px;background:var(--surface3);color:var(--muted)}
 <span class="modal-close">&times;</span>
 <h2>Workout Templates</h2>
 <div id="template-list"></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-custom">
+<div class="modal">
+<span class="modal-close">&times;</span>
+<h2>Add Custom Movement</h2>
+<div class="field"><label>Movement Name</label>
+<input type="text" id="cm-name" placeholder="e.g. Banded Nordic Curl" style="width:100%"></div>
+<div class="field"><label>Equipment</label>
+<select id="cm-equipment" style="width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius)">
+</select></div>
+<div class="field"><label>Category</label>
+<select id="cm-category" style="width:100%;padding:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius)">
+</select></div>
+<div class="field"><label>Primary Muscle (optional)</label>
+<input type="text" id="cm-primary" placeholder="e.g. Hamstrings" style="width:100%"></div>
+<div class="field"><label>Description</label>
+<textarea id="cm-desc" rows="3" placeholder="Coaching cues and explanation..." style="width:100%"></textarea></div>
+<div style="display:flex;gap:8px;margin-top:16px">
+<button class="btn btn-accent" id="cm-save">Add Movement</button>
+</div>
+<div id="cm-error" style="color:#ef4444;font-size:.8rem;margin-top:8px;display:none"></div>
 </div>
 </div>
 
@@ -1334,6 +1432,18 @@ $$('.ex-row').forEach(r=>r.classList.remove('drag-over-row'));
 
 // === EVENTS ===
 function wireEvents(){
+// Mobile sidebar toggle
+$('#sidebar-toggle').addEventListener('click',function(){
+$('#sidebar').classList.toggle('open');
+$('#sidebar-overlay').classList.toggle('open');
+});
+$('#sidebar-overlay').addEventListener('click',function(){
+$('#sidebar').classList.remove('open');
+this.classList.remove('open');
+});
+
+// Close sidebar when adding to circuit on mobile
+
 // Tab navigation
 $('#nav').addEventListener('click',function(e){
 const btn=e.target.closest('button[data-tab]');
@@ -1383,6 +1493,8 @@ const card=e.target.closest('.mv-card');
 if(!card)return;
 const idx=parseInt(card.dataset.idx);
 addToCircuit(movements[idx]);
+$('#sidebar').classList.remove('open');
+$('#sidebar-overlay').classList.remove('open');
 });
 
 // Rep mode toggle
@@ -1414,12 +1526,45 @@ $('#btn-pdf').addEventListener('click',function(){window.print()});
 $('#btn-generate').addEventListener('click',openGenerate);
 $('#gen-full').addEventListener('click',generateFull);
 $('#gen-pinned').addEventListener('click',generatePinned);
+$('#gen-eq-all').addEventListener('click',function(){
+$$('#gen-eq input[type="checkbox"]').forEach(cb=>{cb.checked=true;cb.closest('.gen-eq-item').classList.add('active')});
+});
+$('#gen-eq-none').addEventListener('click',function(){
+$$('#gen-eq input[type="checkbox"]').forEach(cb=>{cb.checked=false;cb.closest('.gen-eq-item').classList.remove('active')});
+});
 
 // Balance
 $('#btn-balance').addEventListener('click',openBalance);
 
 // Templates
 $('#btn-templates').addEventListener('click',openTemplates);
+
+// Custom movement modal
+$('#btn-add-custom').addEventListener('click',function(){
+$('#cm-name').value='';$('#cm-primary').value='';$('#cm-desc').value='';
+$('#cm-error').style.display='none';
+// Populate selects
+const eqSel=$('#cm-equipment');
+eqSel.innerHTML='';
+EQ_LIST.forEach(eq=>{const o=document.createElement('option');o.value=eq;o.textContent=eq;eqSel.appendChild(o)});
+const catSel=$('#cm-category');
+catSel.innerHTML='';
+CAT_LIST.forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)});
+$('#modal-custom').classList.add('open');
+});
+$('#cm-save').addEventListener('click',function(){
+const name=$('#cm-name').value.trim();
+if(!name){$('#cm-error').textContent='Name is required.';$('#cm-error').style.display='block';return}
+if(movements.find(m=>m.movement.toLowerCase()===name.toLowerCase())){
+$('#cm-error').textContent='A movement with that name already exists.';$('#cm-error').style.display='block';return}
+const mv={movement:name,equipment:$('#cm-equipment').value,category:$('#cm-category').value,
+explanation:$('#cm-desc').value.trim()||'',rating:0,primary:$('#cm-primary').value.trim(),_custom:true};
+movements.push(mv);
+customs.push(mv);
+localStorage.setItem('wg_custom_v1',JSON.stringify(customs));
+$('#modal-custom').classList.remove('open');
+buildFilters();filterMvs();
+});
 
 // Preview toggle
 $('#preview-toggle').addEventListener('click',function(){
@@ -1439,6 +1584,8 @@ this.closest('.modal-overlay').classList.remove('open');
 $('#md-add').addEventListener('click',function(){
 if(currentDetailMv)addToCircuit(currentDetailMv);
 $('#modal-detail').classList.remove('open');
+$('#sidebar').classList.remove('open');
+$('#sidebar-overlay').classList.remove('open');
 });
 $('#md-delete').addEventListener('click',deleteCurrentMv);
 $('#md-edit-url').addEventListener('click',function(){
@@ -1584,15 +1731,53 @@ circuits.forEach((c,ci)=>{
 html+='<div class="circuit" data-cid="'+c.id+'">';
 html+='<div class="circuit-header">';
 html+='<input type="text" value="'+esc(c.name)+'" data-field="cname" data-ci="'+ci+'">';
-if(c.override)html+='<span class="override-badge">'+c.oWork+'s/'+c.oRest+'s</span>';
+// Build override badge
+if(c.override){
+const mode=c.oMode||'fixed';
+if(mode==='timed')html+='<span class="override-badge">'+(c.oTotalMin||6)+'min</span>';
+else if(mode==='descending'||mode==='ascending'){
+html+='<span class="override-badge">'+mode.charAt(0).toUpperCase()+mode.slice(1)+' '+(c.oStartWork||50)+'→'+(c.oEndWork||30)+'s</span>';
+}else html+='<span class="override-badge">'+c.oWork+'s/'+c.oRest+'s'+(c.oRounds?' ×'+c.oRounds:'')+'</span>';
+}
 html+='<div class="circuit-actions">';
-html+='<button class="btn btn-sm btn-outline" data-act="override" data-ci="'+ci+'" title="Override W/R">⏱</button>';
+html+='<button class="btn btn-sm btn-outline" data-act="override" data-ci="'+ci+'" title="Circuit Timing">⏱</button>';
 html+='<button class="btn btn-sm btn-outline" data-act="dup" data-ci="'+ci+'" title="Duplicate">⧉</button>';
 html+='<button class="btn btn-sm btn-outline" data-act="delc" data-ci="'+ci+'" title="Delete">✕</button>';
 html+='</div></div>';
+// Override panel
+const mode=c.oMode||'fixed';
 html+='<div class="override-row'+(c.override?' active':'')+'" data-ci="'+ci+'">';
+html+='<div class="override-timing-chips">';
+['fixed','descending','ascending','timed'].forEach(tm=>{
+const labels={fixed:'Fixed',descending:'Descending',ascending:'Ascending',timed:'Timed Block'};
+html+='<span class="otc'+(mode===tm?' active':'')+'" data-ci="'+ci+'" data-mode="'+tm+'">'+labels[tm]+'</span>';
+});
+html+='</div>';
+html+='<div class="override-fields">';
+if(mode==='fixed'){
 html+='<label>Work (s) <input type="number" value="'+(c.oWork||30)+'" data-field="owork" data-ci="'+ci+'" min="5" step="5"></label>';
 html+='<label>Rest (s) <input type="number" value="'+(c.oRest||15)+'" data-field="orest" data-ci="'+ci+'" min="0" step="5"></label>';
+html+='<label>Rounds <input type="number" value="'+(c.oRounds||'')+'" data-field="orounds" data-ci="'+ci+'" min="0" max="20" placeholder="—" title="Leave blank to use global"></label>';
+}else if(mode==='descending'||mode==='ascending'){
+html+='<label>Start (s) <input type="number" value="'+(c.oStartWork||(mode==='descending'?50:20))+'" data-field="ostartwork" data-ci="'+ci+'" min="5" step="5"></label>';
+html+='<label>End (s) <input type="number" value="'+(c.oEndWork||(mode==='descending'?20:50))+'" data-field="oendwork" data-ci="'+ci+'" min="5" step="5"></label>';
+html+='<label>Step (s) <input type="number" value="'+(c.oStep||10)+'" data-field="ostep" data-ci="'+ci+'" min="5" step="5"></label>';
+html+='<label>Rest (s) <input type="number" value="'+(c.oRest||15)+'" data-field="orest" data-ci="'+ci+'" min="0" step="5"></label>';
+}else if(mode==='timed'){
+html+='<label>Total Time (min) <input type="number" value="'+(c.oTotalMin||6)+'" data-field="ototalmin" data-ci="'+ci+'" min="1" max="60" step="0.5"></label>';
+html+='<label>Rest Between (s) <input type="number" value="'+(c.oRest||0)+'" data-field="orest" data-ci="'+ci+'" min="0" step="5"></label>';
+}
+html+='</div>';
+// Preview for descending/ascending
+if(mode==='descending'||mode==='ascending'){
+const start=c.oStartWork||(mode==='descending'?50:20);
+const end=c.oEndWork||(mode==='descending'?20:50);
+const step=c.oStep||10;
+const dir=mode==='descending'?-1:1;
+const rounds=[];let t=start;
+for(let r=0;r<10;r++){rounds.push(t+'s');t+=dir*step;if(dir>0&&t>end)break;if(dir<0&&t<end)break;}
+html+='<div class="override-preview">Rounds: '+rounds.join(' → ')+'</div>';
+}
 html+='</div>';
 html+='<div class="ex-list" data-ci="'+ci+'">';
 if(!c.exercises.length){
@@ -1651,6 +1836,11 @@ const field=this.dataset.field;
 if(field==='cname')circuits[ci].name=this.value;
 else if(field==='owork'){circuits[ci].oWork=parseInt(this.value)||0;renderCircuits();}
 else if(field==='orest'){circuits[ci].oRest=parseInt(this.value)||0;renderCircuits();}
+else if(field==='orounds'){circuits[ci].oRounds=parseInt(this.value)||0;renderCircuits();}
+else if(field==='ostartwork'){circuits[ci].oStartWork=parseInt(this.value)||30;renderCircuits();}
+else if(field==='oendwork'){circuits[ci].oEndWork=parseInt(this.value)||20;renderCircuits();}
+else if(field==='ostep'){circuits[ci].oStep=parseInt(this.value)||10;renderCircuits();}
+else if(field==='ototalmin'){circuits[ci].oTotalMin=parseFloat(this.value)||6;renderCircuits();}
 else if(ei!==null){
 const ex=circuits[ci].exercises[ei];
 if(field==='sets')ex.sets=parseInt(this.value)||1;
@@ -1660,6 +1850,21 @@ else if(field==='exrest')ex.rest=parseInt(this.value)||0;
 else if(field==='notes')ex.notes=this.value;
 }
 calcTime();updatePreview();
+});
+});
+
+// Timing mode chips in override panel
+$$('#circuits .otc').forEach(chip=>{
+chip.addEventListener('click',function(){
+const ci=parseInt(this.dataset.ci);
+const mode=this.dataset.mode;
+circuits[ci].oMode=mode;
+// Set sensible defaults for each mode
+if(mode==='descending'&&!circuits[ci].oStartWork){circuits[ci].oStartWork=50;circuits[ci].oEndWork=20;circuits[ci].oStep=10;}
+if(mode==='ascending'&&!circuits[ci].oStartWork){circuits[ci].oStartWork=20;circuits[ci].oEndWork=50;circuits[ci].oStep=10;}
+if(mode==='timed'&&!circuits[ci].oTotalMin)circuits[ci].oTotalMin=6;
+if(mode==='fixed'&&!circuits[ci].oWork)circuits[ci].oWork=30;
+renderCircuits();
 });
 });
 
@@ -1832,20 +2037,45 @@ renderCircuits();
 
 // === TIME CALC ===
 function calcTime(){
-const rounds=parseInt($('#set-rounds').value)||1;
-const work=parseInt($('#set-work').value)||0;
-const rest=parseInt($('#set-rest').value)||0;
+const globalRounds=parseInt($('#set-rounds').value)||1;
+const globalWork=parseInt($('#set-work').value)||0;
+const globalRest=parseInt($('#set-rest').value)||0;
 const rrest=parseInt($('#set-rrest').value)||0;
 let total=0;
 circuits.forEach(c=>{
-const w=c.override?c.oWork:work;
-const r=c.override?c.oRest:rest;
 const exCount=c.exercises.length;
-total+=rounds*(exCount*(w+r))+rrest;
+if(!exCount){return}
+if(!c.override){
+total+=globalRounds*(exCount*(globalWork+globalRest));
+}else{
+const mode=c.oMode||'fixed';
+if(mode==='fixed'){
+const w=c.oWork||globalWork;
+const r=c.oRest||globalRest;
+const rnds=c.oRounds||globalRounds;
+total+=rnds*(exCount*(w+r));
+}else if(mode==='descending'||mode==='ascending'){
+const start=c.oStartWork||(mode==='descending'?50:20);
+const end=c.oEndWork||(mode==='descending'?20:50);
+const step=c.oStep||10;
+const r=c.oRest||0;
+const dir=mode==='descending'?-1:1;
+let t=start;
+for(let i=0;i<20;i++){
+total+=exCount*(t+r);
+t+=dir*step;
+if(dir>0&&t>end)break;
+if(dir<0&&t<end)break;
+}
+}else if(mode==='timed'){
+total+=(c.oTotalMin||6)*60;
+}
+}
+total+=rrest;
 });
-total-=rrest; // no rest after last round set
+total-=rrest;
 if(total<0)total=0;
-const mins=Math.ceil(total/60);
+const mins=Math.round(total/60*10)/10;
 $('#est-time').textContent='~'+mins+' min';
 }
 
@@ -1857,7 +2087,15 @@ let html='<strong>'+esc($('#workout-name').value)+'</strong><br>';
 html+='Rounds: '+$('#set-rounds').value+' | Work: '+$('#set-work').value+'s | Rest: '+$('#set-rest').value+'s<br><br>';
 circuits.forEach(c=>{
 html+='<div class="prev-circuit"><h4>'+esc(c.name);
-if(c.override)html+=' <span style="font-size:.75rem;font-weight:400;color:var(--muted)">('+c.oWork+'s work / '+c.oRest+'s rest)</span>';
+if(c.override){
+const mode=c.oMode||'fixed';
+if(mode==='timed')html+=' <span style="font-size:.75rem;font-weight:400;color:var(--muted)">('+( c.oTotalMin||6)+' min block, '+( c.oRest||0)+'s rest)</span>';
+else if(mode==='descending'||mode==='ascending'){
+html+=' <span style="font-size:.75rem;font-weight:400;color:var(--muted)">('+mode+' '+(c.oStartWork||50)+'→'+(c.oEndWork||20)+'s, '+( c.oRest||0)+'s rest)</span>';
+}else{
+html+=' <span style="font-size:.75rem;font-weight:400;color:var(--muted)">('+( c.oWork||30)+'s/'+( c.oRest||0)+'s'+(c.oRounds?' ×'+c.oRounds:'')+')</span>';
+}
+}
 html+='</h4>';
 c.exercises.forEach(ex=>{
 const rep=repMode==='range'?(ex.repRange||ex.reps):ex.reps;
@@ -1911,6 +2149,11 @@ const cnt=movements.filter(m=>m.equipment===eq).length;
 html+='<label class="gen-eq-item active"><input type="checkbox" value="'+esc(eq)+'" checked> '+esc(eq)+' <span class="cnt">('+cnt+')</span></label>';
 });
 grid.innerHTML=html;
+grid.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+cb.addEventListener('change',function(){
+this.closest('.gen-eq-item').classList.toggle('active',this.checked);
+});
+});
 
 // Format chips
 const fmtWrap=$('#gen-formats');
