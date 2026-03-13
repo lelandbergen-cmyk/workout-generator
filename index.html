@@ -380,6 +380,7 @@ html{font-size:12px}
 <div id="circuits"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
 <button class="btn btn-accent" id="btn-add-circuit">+ Add Circuit</button>
+<button class="btn btn-accent" id="btn-warmup" style="background:#f97316;color:#000">🔥 Warm-Up</button>
 <button class="btn btn-outline" id="btn-save">Save Workout</button>
 <button class="btn btn-outline" id="btn-export-json">Export JSON</button>
 <button class="btn btn-outline" id="btn-pdf">Print / PDF</button>
@@ -528,6 +529,14 @@ html{font-size:12px}
 <button class="btn btn-accent" id="cm-save">Add Movement</button>
 </div>
 <div id="cm-error" style="color:#ef4444;font-size:.8rem;margin-top:8px;display:none"></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-warmup">
+<div class="modal">
+<span class="modal-close">&times;</span>
+<h2>🔥 Warm-Up Generator</h2>
+<div id="warmup-content"></div>
 </div>
 </div>
 
@@ -2714,8 +2723,116 @@ updateSavedCount();renderSaved();
 });
 }
 
+// === WARM-UP GENERATOR ===
+const WARMUP_MOVES={
+'Squat / Lower':[
+{name:'Hip Circles',dur:'30s each direction',desc:'Hands on hips, circle each hip slowly'},
+{name:'Leg Swings',dur:'10 each leg',desc:'Front to back, hold wall for balance'},
+{name:'Lateral Leg Swings',dur:'10 each leg',desc:'Side to side across the body'},
+{name:'Bodyweight Squat',dur:'10 reps',desc:'Slow tempo, full depth'},
+{name:'Cossack Squat',dur:'5 each side',desc:'Wide stance, shift side to side'},
+{name:'Walking Lunge',dur:'8 each leg',desc:'Long stride, upright torso'},
+{name:'Glute Bridge',dur:'10 reps',desc:'Squeeze glutes 2s at top'},
+{name:'Ankle Circles',dur:'10 each direction',desc:'Point and circle each ankle'},
+{name:'Inchworm',dur:'5 reps',desc:'Walk hands out to plank, walk feet up'},
+{name:'World\'s Greatest Stretch',dur:'5 each side',desc:'Lunge + rotate + reach'}
+],
+'Push / Upper':[
+{name:'Arm Circles',dur:'10 each direction',desc:'Small to big circles, forward and back'},
+{name:'Band Pull Apart',dur:'15 reps',desc:'Light tension, squeeze rear delts'},
+{name:'Shoulder Pass-Through',dur:'10 reps',desc:'Use band or stick, wide grip overhead'},
+{name:'Push-Up',dur:'8 reps',desc:'Controlled tempo warm-up'},
+{name:'Scapular Push-Up',dur:'10 reps',desc:'Plank position, protract and retract shoulder blades'},
+{name:'Wall Slide',dur:'10 reps',desc:'Back against wall, slide arms overhead'},
+{name:'Thoracic Rotation',dur:'8 each side',desc:'Quadruped position, rotate and reach'},
+{name:'Wrist Circles',dur:'10 each direction',desc:'Loosen wrists before pressing'}
+],
+'Pull / Upper':[
+{name:'Band Pull Apart',dur:'15 reps',desc:'Light band, chest height'},
+{name:'Cat-Cow',dur:'10 reps',desc:'Alternate arching and rounding spine'},
+{name:'Dead Hang',dur:'20s',desc:'Relax into full hang, decompress spine'},
+{name:'Scapular Pull-Up',dur:'8 reps',desc:'Hang and pull shoulder blades down'},
+{name:'Band Face Pull',dur:'12 reps',desc:'External rotation at the end'},
+{name:'Thoracic Extension',dur:'10 reps',desc:'Foam roll upper back or reach over bench'},
+{name:'Arm Circles',dur:'10 each direction',desc:'Loosen shoulders progressively'}
+],
+'Carry / Core':[
+{name:'Dead Bug',dur:'8 each side',desc:'Slow and controlled, back flat'},
+{name:'Bird Dog',dur:'8 each side',desc:'Opposite arm and leg, hold 2s'},
+{name:'Plank Hold',dur:'20s',desc:'Squeeze everything tight'},
+{name:'Side Plank',dur:'15s each side',desc:'Stack feet or stagger'},
+{name:'Cat-Cow',dur:'10 reps',desc:'Flow between positions'},
+{name:'Pallof Press Hold',dur:'15s each side',desc:'Band or cable, resist rotation'}
+],
+'Conditioning':[
+{name:'Jumping Jacks',dur:'20 reps',desc:'Get heart rate up'},
+{name:'High Knees',dur:'15s',desc:'Quick feet, pump arms'},
+{name:'Butt Kicks',dur:'15s',desc:'Light and quick'},
+{name:'Lateral Shuffle',dur:'10 each way',desc:'Athletic stance, stay low'},
+{name:'Inchworm',dur:'5 reps',desc:'Walk out, walk back, stand'},
+{name:'Bodyweight Squat',dur:'10 reps',desc:'Open up the hips'},
+{name:'Arm Circles',dur:'10 each direction',desc:'Big circles to warm shoulders'}
+]
+};
+
+function generateWarmup(){
+// Look at what categories are in the workout
+const cats={};
+circuits.forEach(c=>c.exercises.forEach(ex=>{
+cats[ex.category]=(cats[ex.category]||0)+1;
+}));
+if(!Object.keys(cats).length){alert('Add exercises first so the warm-up matches your workout.');return}
+
+// Sort categories by frequency (most used first)
+const sorted=Object.keys(cats).sort((a,b)=>cats[b]-cats[a]);
+
+// Pick warm-up moves: more from primary categories
+const picks=[];
+const used=new Set();
+sorted.forEach((cat,i)=>{
+const pool=WARMUP_MOVES[cat]||WARMUP_MOVES['Conditioning'];
+const count=i===0?5:i===1?3:2;
+const shuffled=[...pool].sort(()=>Math.random()-0.5);
+shuffled.forEach(m=>{
+if(picks.length<10&&!used.has(m.name)){used.add(m.name);picks.push({...m,cat:cat})}
+});
+});
+
+// Build modal content
+let html='<div style="margin-bottom:12px;font-size:.8rem;color:var(--muted)">Based on your workout focus: '+
+sorted.slice(0,3).join(', ')+'</div>';
+html+='<div style="font-size:.78rem;color:var(--accent);margin-bottom:12px">~5 minutes</div>';
+picks.slice(0,8).forEach((p,i)=>{
+html+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">';
+html+='<span style="font-family:DM Mono;font-size:.75rem;color:var(--accent);min-width:20px">'+(i+1)+'</span>';
+html+='<div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+esc(p.name)+'</div>';
+html+='<div style="font-size:.75rem;color:var(--muted)">'+esc(p.desc)+' · <span style="color:var(--accent)">'+esc(p.dur)+'</span></div></div></div>';
+});
+html+='<div style="margin-top:16px;display:flex;gap:8px">';
+html+='<button class="btn btn-accent btn-sm" id="warmup-regen">🔀 Regenerate</button>';
+html+='<button class="btn btn-outline btn-sm" id="warmup-add">+ Add as Circuit</button></div>';
+
+$('#warmup-content').innerHTML=html;
+$('#modal-warmup').classList.add('open');
+
+$('#warmup-regen').addEventListener('click',function(){generateWarmup()});
+$('#warmup-add').addEventListener('click',function(){
+const c={id:uid(),name:'Warm-Up',exercises:[],override:true,oWork:30,oRest:10,oRounds:1,oMode:'fixed'};
+picks.slice(0,8).forEach(p=>{
+c.exercises.push({id:uid(),movement:p.name,equipment:'Bodyweight',category:p.cat,
+sets:1,reps:1,repRange:p.dur,rest:0,notes:p.desc,pinned:false});
+});
+circuits.unshift(c);
+$('#modal-warmup').classList.remove('open');
+renderCircuits();
+});
+}
+
 // === BOOT ===
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded',function(){
+init();
+$('#btn-warmup').addEventListener('click',generateWarmup);
+});
 </script>
 </body>
 </html>
