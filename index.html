@@ -385,10 +385,15 @@ html{font-size:12px}
 <button class="btn btn-accent btn-sm" id="btn-generate">⚡ Generate</button>
 </div>
 </div>
+<div class="section-card" style="margin-top:8px">
+<div class="section-title">Notes</div>
+<textarea id="workout-notes" rows="3" placeholder="Workout intent, coaching notes, focus areas..." style="width:100%;resize:vertical;font-size:.85rem;line-height:1.5"></textarea>
+</div>
 <div id="circuits"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
 <button class="btn btn-accent" id="btn-add-circuit">+ Add Circuit</button>
 <button class="btn btn-accent" id="btn-warmup" style="background:var(--sage);color:#fff">🔥 Warm-Up</button>
+<button class="btn btn-outline" id="btn-clear-circuits">Clear All</button>
 <button class="btn btn-outline" id="btn-save">Save Workout</button>
 <button class="btn btn-outline" id="btn-export-json">Export JSON</button>
 <button class="btn btn-outline" id="btn-pdf">Print / PDF</button>
@@ -1624,6 +1629,14 @@ circuits.push({id:uid(),name:'Circuit '+(circuits.length+1),exercises:[],overrid
 renderCircuits();
 });
 
+// Clear all circuits
+$('#btn-clear-circuits').addEventListener('click',function(){
+if(!circuits.length||!circuits.some(c=>c.exercises.length))return;
+if(!confirm('Clear all circuits and exercises?'))return;
+circuits=[{id:uid(),name:'Circuit 1',exercises:[],override:false,oWork:0,oRest:0}];
+renderCircuits();
+});
+
 // Save
 $('#btn-save').addEventListener('click',saveWorkout);
 $('#btn-export-json').addEventListener('click',exportJSON);
@@ -2240,7 +2253,10 @@ function updatePreview(){
 const pc=$('#preview-content');
 if(!pc.classList.contains('open'))return;
 let html='<strong>'+esc($('#workout-name').value)+'</strong><br>';
-html+='Rounds: '+$('#set-rounds').value+' | Work: '+$('#set-work').value+'s | Rest: '+$('#set-rest').value+'s<br><br>';
+html+='Rounds: '+$('#set-rounds').value+' | Work: '+$('#set-work').value+'s | Rest: '+$('#set-rest').value+'s<br>';
+const notes=$('#workout-notes').value;
+if(notes)html+='<div style="font-size:.8rem;color:var(--muted);font-style:italic;margin:6px 0;line-height:1.4">'+esc(notes)+'</div>';
+html+='<br>';
 circuits.forEach(c=>{
 html+='<div class="prev-circuit"><h4>'+esc(c.name);
 if(c.override){
@@ -2684,8 +2700,9 @@ $('#modal-templates').classList.add('open');
 // === SAVE / EXPORT ===
 function saveWorkout(){
 const name=$('#workout-name').value||'Untitled';
+const notes=$('#workout-notes').value||'';
 const workout={
-id:uid(),name:name,date:new Date().toISOString(),
+id:uid(),name:name,date:new Date().toISOString(),notes:notes,
 settings:{rounds:$('#set-rounds').value,work:$('#set-work').value,
 rest:$('#set-rest').value,rrest:$('#set-rrest').value},
 repMode:repMode,circuits:JSON.parse(JSON.stringify(circuits))
@@ -2703,8 +2720,8 @@ else badge.style.display='none';
 }
 
 function exportJSON(){
-const data={name:$('#workout-name').value,settings:{
-rounds:$('#set-rounds').value,work:$('#set-work').value,
+const data={name:$('#workout-name').value,notes:$('#workout-notes').value||'',
+settings:{rounds:$('#set-rounds').value,work:$('#set-work').value,
 rest:$('#set-rest').value,rrest:$('#set-rrest').value},
 circuits:circuits};
 const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -2736,6 +2753,7 @@ const dateStr=d.toLocaleDateString()+' '+d.toLocaleTimeString();
 const exCount=w.circuits.reduce((a,c)=>a+c.exercises.length,0);
 html+='<div class="saved-card"><h3>'+esc(w.name)+'</h3>'+
 '<div class="saved-meta">'+dateStr+' · '+w.circuits.length+' circuits · '+exCount+' exercises</div>'+
+(w.notes?'<div style="font-size:.78rem;color:var(--muted);margin:6px 0;line-height:1.4;font-style:italic">'+esc(w.notes).substring(0,150)+(w.notes.length>150?'...':'')+'</div>':'')+
 '<div class="saved-actions">'+
 '<button class="btn btn-accent btn-sm" data-sact="load" data-si="'+i+'">Load</button>'+
 '<button class="btn btn-outline btn-sm" data-sact="export" data-si="'+i+'">Export</button>'+
@@ -2750,6 +2768,7 @@ const act=this.dataset.sact;
 if(act==='load'){
 const w=savedWorkouts[si];
 $('#workout-name').value=w.name;
+$('#workout-notes').value=w.notes||'';
 if(w.settings){
 $('#set-rounds').value=w.settings.rounds;
 $('#set-work').value=w.settings.work;
