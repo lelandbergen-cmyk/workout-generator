@@ -407,9 +407,15 @@ html{font-size:12px}
 <!-- SAVED PANEL -->
 <div id="saved-panel">
 <h2 style="margin-bottom:16px;font-weight:800">Saved Workouts</h2>
-<button class="btn btn-outline btn-sm" id="btn-export-all" style="margin-bottom:16px">Export All JSON</button>
-<button class="btn btn-outline btn-sm" id="btn-import-json" style="margin-bottom:16px">Import JSON</button>
+<button class="btn btn-outline btn-sm" id="btn-export-all" style="margin-bottom:16px">Export Workouts</button>
+<button class="btn btn-outline btn-sm" id="btn-import-json" style="margin-bottom:16px">Import Workouts</button>
+<button class="btn btn-accent btn-sm" id="btn-full-backup" style="margin-bottom:16px">⬇ Full Backup</button>
+<button class="btn btn-outline btn-sm" id="btn-restore-backup" style="margin-bottom:16px">⬆ Restore Backup</button>
 <input type="file" id="import-file" accept=".json" style="display:none">
+<input type="file" id="restore-file" accept=".json" style="display:none">
+<div style="font-size:.72rem;color:var(--muted);margin-bottom:16px;line-height:1.5">
+<strong>Full Backup</strong> saves everything: saved workouts, custom movements, custom equipment, description edits, and video URLs — all in one file. Do this periodically to protect your data.
+</div>
 <div id="saved-list"></div>
 </div>
 </div>
@@ -1673,6 +1679,54 @@ alert('Could not read file. Make sure it is a valid JSON export.');
 reader.readAsText(file);
 this.value=''; // reset so same file can be re-imported
 });
+
+// Full Backup — exports ALL localStorage data
+$('#btn-full-backup').addEventListener('click',function(){
+const backup={
+_type:'workout_architect_full_backup',
+_date:new Date().toISOString(),
+wg_saved_workouts_v1:JSON.parse(localStorage.getItem('wg_saved_workouts_v1')||'[]'),
+wg_custom_v1:JSON.parse(localStorage.getItem('wg_custom_v1')||'[]'),
+wg_custom_eq_v1:JSON.parse(localStorage.getItem('wg_custom_eq_v1')||'[]'),
+wg_desc_overrides_v1:JSON.parse(localStorage.getItem('wg_desc_overrides_v1')||'{}'),
+wg_video_overrides_v1:JSON.parse(localStorage.getItem('wg_video_overrides_v1')||'{}')
+};
+const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='workout_architect_backup_'+new Date().toISOString().slice(0,10)+'.json';
+a.click();
+});
+
+// Restore Backup
+$('#btn-restore-backup').addEventListener('click',function(){$('#restore-file').click()});
+$('#restore-file').addEventListener('change',function(e){
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=function(ev){
+try{
+const data=JSON.parse(ev.target.result);
+if(data._type!=='workout_architect_full_backup'){
+alert('This does not look like a full backup file. Use "Import Workouts" for workout-only files.');return;
+}
+if(!confirm('This will replace ALL your current data (saved workouts, custom movements, descriptions, etc.) with the backup. Continue?'))return;
+if(data.wg_saved_workouts_v1)localStorage.setItem('wg_saved_workouts_v1',JSON.stringify(data.wg_saved_workouts_v1));
+if(data.wg_custom_v1)localStorage.setItem('wg_custom_v1',JSON.stringify(data.wg_custom_v1));
+if(data.wg_custom_eq_v1)localStorage.setItem('wg_custom_eq_v1',JSON.stringify(data.wg_custom_eq_v1));
+if(data.wg_desc_overrides_v1)localStorage.setItem('wg_desc_overrides_v1',JSON.stringify(data.wg_desc_overrides_v1));
+if(data.wg_video_overrides_v1)localStorage.setItem('wg_video_overrides_v1',JSON.stringify(data.wg_video_overrides_v1));
+// Reload to apply everything
+alert('Backup restored! The page will now reload.');
+location.reload();
+}catch(err){
+alert('Could not read backup file.');
+}
+};
+reader.readAsText(file);
+this.value='';
+});
+
 $('#btn-pdf').addEventListener('click',function(){window.print()});
 
 // Generate
