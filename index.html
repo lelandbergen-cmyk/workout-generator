@@ -283,51 +283,74 @@ border-radius:4px;background:var(--surface2);color:var(--muted)}
 /* MOBILE */
 @media(max-width:768px){
 html{font-size:13px}
-#sidebar-toggle{display:block!important}
+#sidebar-toggle{display:block!important;font-size:1.4rem;padding:6px 12px;min-height:44px;min-width:44px}
 #header h1{font-size:1.5rem;letter-spacing:4px}
-#header{padding:10px 12px;height:48px}
-#nav button{padding:5px 10px;font-size:.75rem}
+#header{padding:10px 12px;height:52px}
+#nav button{padding:8px 14px;font-size:.8rem;min-height:44px}
 
-#app{flex-direction:column;height:calc(100vh - 48px)}
-#sidebar{position:fixed;top:48px;left:0;bottom:0;width:85vw;max-width:340px;z-index:500;
+#app{flex-direction:column;height:calc(100vh - 52px)}
+#sidebar{position:fixed;top:52px;left:0;bottom:0;width:88vw;max-width:360px;z-index:500;
 transform:translateX(-100%);transition:transform .25s ease;border-right:1px solid var(--border)}
 #sidebar.open{transform:translateX(0)}
-#sidebar-overlay{display:none;position:fixed;inset:0;top:48px;background:rgba(44,36,32,.3);z-index:499}
+#sidebar-overlay{display:none;position:fixed;inset:0;top:52px;background:rgba(44,36,32,.3);z-index:499}
 #sidebar-overlay.open{display:block}
 
 #main,#saved-panel{padding:12px}
 #workout-name{font-size:1rem}
 .settings-row{gap:8px}
-.settings-row label{font-size:.72rem}
-input[type="number"]{width:50px}
+.settings-row label{font-size:.78rem}
+input[type="number"]{width:54px;min-height:38px;font-size:.9rem}
 
 .circuit-header{flex-wrap:wrap;padding:10px 12px}
-.circuit-header input{font-size:.82rem;min-width:0}
-.ex-row{flex-wrap:wrap;gap:4px;padding:6px 8px}
-.ex-row .ex-info{flex:1 1 100%;min-width:0}
-.ex-row .ex-info .ex-mv-name{font-size:.78rem}
-.ex-row input[type="number"],.ex-row input[type="text"]{width:40px;padding:2px 3px;font-size:.72rem}
-.ex-row .ex-notes{width:60px}
-.ex-row .ex-rest-input{width:36px}
+.circuit-header input{font-size:.82rem;min-width:0;min-height:38px}
+/* Bigger tap targets for circuit action buttons */
+.circuit-actions .btn,.circuit-footer .btn{min-height:38px;padding:6px 10px;font-size:.8rem}
 
+/* Exercise rows: stack info on top, controls below */
+.ex-row{flex-wrap:wrap;gap:6px;padding:10px 8px}
+.ex-row .ex-info{flex:1 1 100%;min-width:0}
+.ex-row .ex-info .ex-mv-name{font-size:.85rem}
+/* Bigger inputs and tap-target buttons */
+.ex-row input[type="number"],.ex-row input[type="text"]{width:48px;padding:5px 4px;font-size:.82rem;min-height:36px}
+.ex-row .ex-notes{width:70px;min-height:36px}
+.ex-row .ex-rest-input{width:44px;min-height:36px}
+.ex-row .pin-btn,.ex-row .del-btn,.ex-row .reroll-btn{min-height:36px;min-width:32px;padding:4px 6px;font-size:.9rem}
+.ex-row .drag-handle{font-size:1rem;padding:4px 6px}
+
+/* Modals */
 .modal{max-width:95vw;padding:16px;max-height:90vh}
 .modal h2{font-size:1rem}
+.modal-close{font-size:1.4rem;padding:8px;top:10px;right:10px}
 .gen-eq-grid{grid-template-columns:repeat(2,1fr)}
 #gen-formats{grid-template-columns:repeat(2,1fr)!important}
 
-#filters,#filters2{gap:3px;padding:6px 10px}
-.chip{font-size:.65rem;padding:2px 7px}
-.mv-card{padding:6px 10px}
-.mv-card .mv-name{font-size:.78rem}
-.mv-card .eq-tag{font-size:.58rem}
+/* Filter chips — bigger tap targets */
+#filters,#filters2{gap:5px;padding:8px 10px}
+.chip{font-size:.72rem;padding:6px 12px;min-height:36px;display:inline-flex;align-items:center}
+
+/* Movement cards */
+.mv-card{padding:10px 12px}
+.mv-card .mv-name{font-size:.82rem}
+.mv-card .eq-tag{font-size:.62rem}
 
 .section-card{padding:12px}
 .section-title{font-size:.88rem}
 .saved-card{padding:12px}
 
+/* Action buttons — full width, stacked, easy to tap */
+#circuits + div{display:flex;flex-direction:column;gap:8px}
+#circuits + div .btn{width:100%;min-height:46px;font-size:.92rem;justify-content:center}
+
 /* Safe area for notch phones */
 #header{padding-top:max(10px,env(safe-area-inset-top))}
-#sidebar{top:max(48px,calc(48px + env(safe-area-inset-top)))}
+#sidebar{top:max(52px,calc(52px + env(safe-area-inset-top)))}
+}
+@media(max-width:480px){
+html{font-size:12.5px}
+.gen-eq-grid{grid-template-columns:1fr 1fr}
+.settings-row{flex-direction:column;align-items:stretch}
+.settings-row label{flex-direction:row;justify-content:space-between;align-items:center}
+#workout-name{font-size:.95rem}
 }
 @media(max-width:380px){
 html{font-size:12px}
