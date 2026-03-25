@@ -283,74 +283,51 @@ border-radius:4px;background:var(--surface2);color:var(--muted)}
 /* MOBILE */
 @media(max-width:768px){
 html{font-size:13px}
-#sidebar-toggle{display:block!important;font-size:1.4rem;padding:6px 12px;min-height:44px;min-width:44px}
+#sidebar-toggle{display:block!important}
 #header h1{font-size:1.5rem;letter-spacing:4px}
-#header{padding:10px 12px;height:52px}
-#nav button{padding:8px 14px;font-size:.8rem;min-height:44px}
+#header{padding:10px 12px;height:48px}
+#nav button{padding:5px 10px;font-size:.75rem}
 
-#app{flex-direction:column;height:calc(100vh - 52px)}
-#sidebar{position:fixed;top:52px;left:0;bottom:0;width:88vw;max-width:360px;z-index:500;
+#app{flex-direction:column;height:calc(100vh - 48px)}
+#sidebar{position:fixed;top:48px;left:0;bottom:0;width:85vw;max-width:340px;z-index:500;
 transform:translateX(-100%);transition:transform .25s ease;border-right:1px solid var(--border)}
 #sidebar.open{transform:translateX(0)}
-#sidebar-overlay{display:none;position:fixed;inset:0;top:52px;background:rgba(44,36,32,.3);z-index:499}
+#sidebar-overlay{display:none;position:fixed;inset:0;top:48px;background:rgba(44,36,32,.3);z-index:499}
 #sidebar-overlay.open{display:block}
 
 #main,#saved-panel{padding:12px}
 #workout-name{font-size:1rem}
 .settings-row{gap:8px}
-.settings-row label{font-size:.78rem}
-input[type="number"]{width:54px;min-height:38px;font-size:.9rem}
+.settings-row label{font-size:.72rem}
+input[type="number"]{width:50px}
 
 .circuit-header{flex-wrap:wrap;padding:10px 12px}
-.circuit-header input{font-size:.82rem;min-width:0;min-height:38px}
-/* Bigger tap targets for circuit action buttons */
-.circuit-actions .btn,.circuit-footer .btn{min-height:38px;padding:6px 10px;font-size:.8rem}
-
-/* Exercise rows: stack info on top, controls below */
-.ex-row{flex-wrap:wrap;gap:6px;padding:10px 8px}
+.circuit-header input{font-size:.82rem;min-width:0}
+.ex-row{flex-wrap:wrap;gap:4px;padding:6px 8px}
 .ex-row .ex-info{flex:1 1 100%;min-width:0}
-.ex-row .ex-info .ex-mv-name{font-size:.85rem}
-/* Bigger inputs and tap-target buttons */
-.ex-row input[type="number"],.ex-row input[type="text"]{width:48px;padding:5px 4px;font-size:.82rem;min-height:36px}
-.ex-row .ex-notes{width:70px;min-height:36px}
-.ex-row .ex-rest-input{width:44px;min-height:36px}
-.ex-row .pin-btn,.ex-row .del-btn,.ex-row .reroll-btn{min-height:36px;min-width:32px;padding:4px 6px;font-size:.9rem}
-.ex-row .drag-handle{font-size:1rem;padding:4px 6px}
+.ex-row .ex-info .ex-mv-name{font-size:.78rem}
+.ex-row input[type="number"],.ex-row input[type="text"]{width:40px;padding:2px 3px;font-size:.72rem}
+.ex-row .ex-notes{width:60px}
+.ex-row .ex-rest-input{width:36px}
 
-/* Modals */
 .modal{max-width:95vw;padding:16px;max-height:90vh}
 .modal h2{font-size:1rem}
-.modal-close{font-size:1.4rem;padding:8px;top:10px;right:10px}
 .gen-eq-grid{grid-template-columns:repeat(2,1fr)}
 #gen-formats{grid-template-columns:repeat(2,1fr)!important}
 
-/* Filter chips — bigger tap targets */
-#filters,#filters2{gap:5px;padding:8px 10px}
-.chip{font-size:.72rem;padding:6px 12px;min-height:36px;display:inline-flex;align-items:center}
-
-/* Movement cards */
-.mv-card{padding:10px 12px}
-.mv-card .mv-name{font-size:.82rem}
-.mv-card .eq-tag{font-size:.62rem}
+#filters,#filters2{gap:3px;padding:6px 10px}
+.chip{font-size:.65rem;padding:2px 7px}
+.mv-card{padding:6px 10px}
+.mv-card .mv-name{font-size:.78rem}
+.mv-card .eq-tag{font-size:.58rem}
 
 .section-card{padding:12px}
 .section-title{font-size:.88rem}
 .saved-card{padding:12px}
 
-/* Action buttons — full width, stacked, easy to tap */
-#circuits + div{display:flex;flex-direction:column;gap:8px}
-#circuits + div .btn{width:100%;min-height:46px;font-size:.92rem;justify-content:center}
-
 /* Safe area for notch phones */
 #header{padding-top:max(10px,env(safe-area-inset-top))}
-#sidebar{top:max(52px,calc(52px + env(safe-area-inset-top)))}
-}
-@media(max-width:480px){
-html{font-size:12.5px}
-.gen-eq-grid{grid-template-columns:1fr 1fr}
-.settings-row{flex-direction:column;align-items:stretch}
-.settings-row label{flex-direction:row;justify-content:space-between;align-items:center}
-#workout-name{font-size:.95rem}
+#sidebar{top:max(48px,calc(48px + env(safe-area-inset-top)))}
 }
 @media(max-width:380px){
 html{font-size:12px}
@@ -416,6 +393,7 @@ html{font-size:12px}
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
 <button class="btn btn-accent" id="btn-add-circuit">+ Add Circuit</button>
 <button class="btn btn-accent" id="btn-warmup" style="background:var(--sage);color:#fff">🔥 Warm-Up</button>
+<button class="btn btn-accent" id="btn-burner" style="background:var(--rust);color:#fff">💀 Finisher</button>
 <button class="btn btn-outline" id="btn-clear-circuits">Clear All</button>
 <button class="btn btn-outline" id="btn-save">Save Workout</button>
 <button class="btn btn-outline" id="btn-export-json">Export JSON</button>
@@ -581,6 +559,21 @@ html{font-size:12px}
 <span class="modal-close">&times;</span>
 <h2>🔥 Warm-Up Generator</h2>
 <div id="warmup-content"></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-burner">
+<div class="modal" style="max-width:560px">
+<span class="modal-close">&times;</span>
+<h2>💀 Burner / Finisher</h2>
+<div class="field"><label>Style</label>
+<div id="burner-styles" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
+</div>
+<div class="field"><label>Equipment (uses your generate filters)</label></div>
+<div class="settings-row">
+<label>Exercises <input type="number" id="burner-count" value="3" min="2" max="6"></label>
+</div>
+<div id="burner-content" style="margin-top:12px"></div>
 </div>
 </div>
 
@@ -2374,7 +2367,7 @@ const FORMATS=[
 {id:'chipper',name:'Chipper',icon:'🪓',desc:'One long circuit — chip through every exercise once with high reps. No repeated rounds.',work:0,rest:0,rounds:1,rrest:0},
 {id:'hwpo',name:'HWPO MetCon',icon:'🏋',desc:'HWPO-style: alternating EMOM blocks with AMRAP finishers. Strength meets conditioning.',work:60,rest:0,rounds:5,rrest:90},
 {id:'endurance',name:'Endurance',icon:'🫁',desc:'Long work intervals, short rest. Build sustained output and mental toughness.',work:50,rest:10,rounds:4,rrest:60},
-{id:'strength',name:'Strength',icon:'💪',desc:'Heavier loading focus. Longer rest, fewer reps, emphasis on push/pull/squat balance.',work:40,rest:40,rounds:4,rrest:90},
+{id:'strength',name:'Strength',icon:'💪',desc:'Compounds first (squats, deadlifts, presses), then accessories. Heavier loading, longer rest, lower reps on the big lifts, moderate reps on isolation work.',work:40,rest:60,rounds:4,rrest:90},
 {id:'2on1off',name:'2-on-1-off',icon:'🔁',desc:'Two exercises back-to-back, then rest. Superset-style training for density.',work:30,rest:0,rounds:5,rrest:45}
 ];
 
@@ -2645,6 +2638,50 @@ fin.exercises.forEach(ex=>{ex.reps=12;ex.repRange='AMRAP'});
 circuits.push(fin);
 $('#workout-name').value='HWPO MetCon';
 $('#set-rounds').value=3;$('#set-rrest').value=90;
+} else if(selectedFormat==='strength'){
+// COMPOUND MOVEMENTS FIRST, THEN ACCESSORIES
+// True compounds: barbell/trap bar main lifts + heavy KB/DB full-body moves
+const COMPOUND_EQ=new Set(['Barbell','Trap Bar']);
+const COMPOUND_NAMES=/back squat|front squat|deadlift|bench press|overhead press|power clean|hang clean|push press|clean and jerk|snatch|thruster|hip thrust|pendlay row|bent over row|incline press|floor press|good morning|sumo deadlift|zercher|push jerk|rack pull/i;
+const HEAVY_DB_KB=/thruster|clean|snatch|man maker|turkish get.?up/i;
+const isCompound=m=>(COMPOUND_EQ.has(m.equipment)&&COMPOUND_NAMES.test(m.movement))||((['Dumbbell','Kettlebell'].includes(m.equipment))&&HEAVY_DB_KB.test(m.movement));
+
+const compounds=pool.filter(m=>isCompound(m));
+const accessories=pool.filter(m=>!isCompound(m));
+
+for(let i=0;i<numCircuits;i++){
+const c={id:uid(),name:'Block '+(i+1),exercises:[],override:true,oWork:40,oRest:60,oRounds:4,oMode:'fixed'};
+const catPool=[...CAT_LIST].filter(c=>c!=='Conditioning');
+// Pick 1-2 compounds first
+const numCompounds=Math.min(2,Math.ceil(exPer/2));
+const numAccessories=exPer-numCompounds;
+
+for(let j=0;j<numCompounds;j++){
+const targetCat=focus==='all'?catPool[j%catPool.length]:focus;
+let cands=compounds.filter(m=>m.category===targetCat&&!usedGlobal.has(m.movement));
+if(!cands.length)cands=compounds.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)continue;
+const pick=cands[Math.floor(Math.random()*cands.length)];
+usedGlobal.add(pick.movement);
+c.exercises.push({id:uid(),movement:pick.movement,equipment:pick.equipment,
+category:pick.category,sets:4,reps:5,repRange:'3-5',rest:0,notes:'Heavy',pinned:false});
+}
+for(let j=0;j<numAccessories;j++){
+const targetCat=focus==='all'?catPool[(numCompounds+j)%catPool.length]:focus;
+let cands=accessories.filter(m=>m.category===targetCat&&!usedGlobal.has(m.movement));
+if(!cands.length)cands=accessories.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)continue;
+const pick=cands[Math.floor(Math.random()*cands.length)];
+usedGlobal.add(pick.movement);
+c.exercises.push({id:uid(),movement:pick.movement,equipment:pick.equipment,
+category:pick.category,sets:3,reps:10,repRange:'8-12',rest:0,notes:'Accessory',pinned:false});
+}
+circuits.push(c);
+}
+$('#workout-name').value='Strength Session';
+$('#set-rounds').value=1;$('#set-rrest').value=90;
 } else if(selectedFormat==='2on1off'){
 // Superset pairs
 for(let i=0;i<numCircuits;i++){
@@ -2982,10 +3019,134 @@ renderCircuits();
 });
 }
 
+// === BURNER / FINISHER GENERATOR ===
+const BURNER_STYLES=[
+{id:'tabata',name:'Tabata Burnout',icon:'⚡',desc:'20s max effort / 10s rest × 8 rounds. Pick 2-4 exercises and rotate.',work:20,rest:10,rounds:8},
+{id:'emom',name:'EMOM Finisher',icon:'⏱',desc:'Every minute perform the prescribed reps. Rest the remainder. 5-8 minutes.',work:60,rest:0,rounds:5},
+{id:'amrap',name:'AMRAP Burner',icon:'♾',desc:'As many rounds as possible in 4-6 minutes. Keep moving, no planned rest.',work:0,rest:0,rounds:1},
+{id:'death',name:'Death By...',icon:'💀',desc:'Start with 1 rep. Add 1 rep every minute until you cannot complete within the minute.',work:60,rest:0,rounds:10},
+{id:'ladder',name:'Descending Ladder',icon:'📉',desc:'10-8-6-4-2 reps. Same exercises, reps shrink. Push the pace as reps drop.',work:0,rest:15,rounds:5},
+{id:'cashout',name:'Cash Out',icon:'💰',desc:'One brutal set to close the session. High reps, one or two movements, no rest until done.',work:0,rest:0,rounds:1},
+{id:'sprint',name:'Sprint Intervals',icon:'🏃',desc:'30s all-out / 30s rest × 5-8 rounds. One conditioning movement, max output.',work:30,rest:30,rounds:6}
+];
+
+let selectedBurnerStyle='tabata';
+
+function openBurner(){
+// Build style chips
+const wrap=$('#burner-styles');
+let html='';
+BURNER_STYLES.forEach(s=>{
+html+='<div class="gen-fmt-chip'+(s.id===selectedBurnerStyle?' active':'')+'" data-bid="'+s.id+'">'+
+'<span class="fmt-icon">'+s.icon+'</span>'+esc(s.name)+'</div>';
+});
+wrap.innerHTML=html;
+wrap.querySelectorAll('.gen-fmt-chip').forEach(chip=>{
+chip.addEventListener('click',function(){
+wrap.querySelectorAll('.gen-fmt-chip').forEach(c=>c.classList.remove('active'));
+this.classList.add('active');
+selectedBurnerStyle=this.dataset.bid;
+generateBurner();
+});
+});
+generateBurner();
+$('#modal-burner').classList.add('open');
+// Re-generate on count change
+$('#burner-count').addEventListener('input',generateBurner);
+}
+
+function generateBurner(){
+const style=BURNER_STYLES.find(s=>s.id===selectedBurnerStyle);
+if(!style)return;
+const count=parseInt($('#burner-count').value)||3;
+
+// Build pool from last generate equipment or all
+const eqs=lastGenEqs||allEquipment();
+let pool=movements.filter(m=>eqs.includes(m.equipment));
+// Bias toward conditioning and high-output movements
+const condPool=pool.filter(m=>m.category==='Conditioning');
+const otherPool=pool.filter(m=>m.category!=='Conditioning');
+
+// Pick exercises — mix conditioning with other categories
+const picks=[];
+const used=new Set();
+// Get all exercises already in the workout to avoid repeats
+circuits.forEach(c=>c.exercises.forEach(ex=>used.add(ex.movement)));
+
+// At least half should be conditioning-style
+const condCount=Math.ceil(count/2);
+const otherCount=count-condCount;
+
+function pickFrom(p,n){
+const shuffled=[...p].sort(()=>Math.random()-0.5);
+for(const mv of shuffled){
+if(picks.length>=count)break;
+if(!used.has(mv.movement)){used.add(mv.movement);picks.push(mv);n--;if(n<=0)break;}
+}
+}
+pickFrom(condPool,condCount);
+pickFrom(otherPool,otherCount);
+// Fill remaining if needed
+if(picks.length<count)pickFrom(pool,count-picks.length);
+
+// Build display
+let html='<div style="padding:10px 12px;background:var(--accent-dim);border-radius:var(--radius);margin-bottom:12px">';
+html+='<div style="font-size:.82rem;font-weight:600;color:var(--accent);margin-bottom:4px">'+esc(style.name)+'</div>';
+html+='<div style="font-size:.78rem;color:var(--muted);line-height:1.4">'+esc(style.desc)+'</div>';
+if(style.work)html+='<div style="font-family:DM Mono;font-size:.72rem;color:var(--accent);margin-top:4px">';
+if(style.work&&style.rest)html+=style.work+'s work / '+style.rest+'s rest';
+if(style.rounds>1)html+=' × '+style.rounds+' rounds';
+html+='</div>';
+html+='</div>';
+
+// Exercises
+picks.forEach((mv,i)=>{
+let reps='';
+if(selectedBurnerStyle==='tabata')reps='Max reps in 20s';
+else if(selectedBurnerStyle==='emom')reps=(8+Math.floor(Math.random()*5))+' reps';
+else if(selectedBurnerStyle==='amrap')reps=(8+Math.floor(Math.random()*7))+' reps';
+else if(selectedBurnerStyle==='death')reps='1, 2, 3... +1 each min';
+else if(selectedBurnerStyle==='ladder')reps='10-8-6-4-2';
+else if(selectedBurnerStyle==='cashout')reps=(20+Math.floor(Math.random()*3)*5)+' reps';
+else if(selectedBurnerStyle==='sprint')reps='30s all-out';
+
+html+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">';
+html+='<span style="font-family:DM Mono;font-size:.75rem;color:var(--accent);min-width:20px">'+(i+1)+'</span>';
+html+='<div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+esc(mv.movement)+'</div>';
+html+='<div style="font-size:.75rem;color:var(--muted)"><span class="eq-tag '+eqClass(mv.equipment)+'" style="font-size:.6rem;padding:1px 5px">'+esc(mv.equipment)+'</span> '+esc(reps)+'</div></div></div>';
+});
+
+html+='<div style="margin-top:16px;display:flex;gap:8px">';
+html+='<button class="btn btn-accent btn-sm" id="burner-regen">🔀 Regenerate</button>';
+html+='<button class="btn btn-outline btn-sm" id="burner-add">+ Add as Circuit</button></div>';
+
+$('#burner-content').innerHTML=html;
+
+$('#burner-regen').addEventListener('click',generateBurner);
+$('#burner-add').addEventListener('click',function(){
+const c={id:uid(),name:'💀 '+style.name+' Finisher',exercises:[],override:true,
+oWork:style.work||30,oRest:style.rest||0,oRounds:style.rounds||1,oMode:'fixed'};
+picks.forEach(mv=>{
+let reps=10;
+if(selectedBurnerStyle==='tabata')reps=1;
+else if(selectedBurnerStyle==='cashout')reps=20+Math.floor(Math.random()*3)*5;
+else if(selectedBurnerStyle==='ladder')reps=10;
+else reps=8+Math.floor(Math.random()*5);
+c.exercises.push({id:uid(),movement:mv.movement,equipment:mv.equipment,category:mv.category,
+sets:1,reps:reps,repRange:selectedBurnerStyle==='ladder'?'10-8-6-4-2':(selectedBurnerStyle==='death'?'+1/min':(selectedBurnerStyle==='sprint'?'30s':String(reps))),
+rest:0,notes:'',pinned:false});
+});
+circuits.push(c);
+$('#modal-burner').classList.remove('open');
+renderCircuits();
+});
+}
+
 // === BOOT ===
 document.addEventListener('DOMContentLoaded',function(){
 init();
 $('#btn-warmup').addEventListener('click',generateWarmup);
+$('#btn-burner').addEventListener('click',openBurner);
 });
 </script>
 </body>
