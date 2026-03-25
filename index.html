@@ -240,6 +240,14 @@ border:1px solid rgba(183,65,14,.3);color:#cc5520;font-size:.8rem;margin-top:8px
 .saved-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
 padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
 .saved-card h3{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:1.1rem;letter-spacing:1px;margin-bottom:4px}
+.saved-card .folder-tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:.65rem;
+font-weight:500;text-transform:uppercase;letter-spacing:.5px;background:var(--accent-dim);color:var(--accent);margin-left:6px;vertical-align:middle}
+.folder-chip{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:500;cursor:pointer;
+border:1px solid var(--border);background:#fff;transition:all .15s;white-space:nowrap}
+.folder-chip.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.folder-chip .fcnt{font-family:'DM Mono',monospace;font-size:.65rem;margin-left:3px;opacity:.6}
+.folder-chip-add{border-style:dashed!important;color:var(--accent)!important;opacity:.7}
+.folder-chip-add:hover{opacity:1;border-color:var(--accent)!important;background:var(--accent-dim)!important}
 .saved-card .saved-meta{font-size:.75rem;color:var(--muted);margin-bottom:10px}
 .saved-card .saved-actions{display:flex;gap:6px}
 
@@ -407,15 +415,18 @@ html{font-size:12px}
 
 <!-- SAVED PANEL -->
 <div id="saved-panel">
-<h2 style="margin-bottom:16px;font-weight:800">Saved Workouts</h2>
-<button class="btn btn-outline btn-sm" id="btn-export-all" style="margin-bottom:16px">Export Workouts</button>
-<button class="btn btn-outline btn-sm" id="btn-import-json" style="margin-bottom:16px">Import Workouts</button>
-<button class="btn btn-accent btn-sm" id="btn-full-backup" style="margin-bottom:16px">⬇ Full Backup</button>
-<button class="btn btn-outline btn-sm" id="btn-restore-backup" style="margin-bottom:16px">⬆ Restore Backup</button>
+<h2 style="margin-bottom:12px;font-weight:800">Saved Workouts</h2>
+<div id="saved-folders" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px"></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+<button class="btn btn-outline btn-sm" id="btn-export-all">Export Workouts</button>
+<button class="btn btn-outline btn-sm" id="btn-import-json">Import Workouts</button>
+<button class="btn btn-accent btn-sm" id="btn-full-backup">⬇ Full Backup</button>
+<button class="btn btn-outline btn-sm" id="btn-restore-backup">⬆ Restore Backup</button>
+</div>
 <input type="file" id="import-file" accept=".json" style="display:none">
 <input type="file" id="restore-file" accept=".json" style="display:none">
 <div style="font-size:.72rem;color:var(--muted);margin-bottom:16px;line-height:1.5">
-<strong>Full Backup</strong> saves everything: saved workouts, custom movements, custom equipment, description edits, and video URLs — all in one file. Do this periodically to protect your data.
+<strong>Full Backup</strong> saves everything: saved workouts, custom movements, custom equipment, description edits, and video URLs — all in one file.
 </div>
 <div id="saved-list"></div>
 </div>
@@ -574,6 +585,21 @@ html{font-size:12px}
 <label>Exercises <input type="number" id="burner-count" value="3" min="2" max="6"></label>
 </div>
 <div id="burner-content" style="margin-top:12px"></div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-save">
+<div class="modal" style="max-width:420px">
+<span class="modal-close">&times;</span>
+<h2>Save Workout</h2>
+<div class="field"><label>Workout Name</label>
+<input type="text" id="save-name" style="width:100%"></div>
+<div class="field"><label>Folder</label>
+<div id="save-folder-list" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px"></div>
+</div>
+<div style="display:flex;gap:8px;margin-top:16px">
+<button class="btn btn-accent" id="save-confirm">Save</button>
+</div>
 </div>
 </div>
 
@@ -1424,6 +1450,11 @@ movements.forEach(m=>{if(m.equipment)set.add(m.equipment)});
 return [...set];
 }
 let savedWorkouts=JSON.parse(localStorage.getItem('wg_saved_workouts_v1')||'[]');
+
+const DEFAULT_FOLDERS=['All','Stride — Power','Stride — Power HIIT','Stride — Chipper','Strength','HIIT / Conditioning','Endurance','Custom'];
+let customFolders=JSON.parse(localStorage.getItem('wg_folders_v1')||'[]');
+let activeSavedFolder='All';
+function allFolders(){return [...DEFAULT_FOLDERS,...customFolders]}
 movements=movements.concat(customs);
 // Apply saved description overrides
 Object.keys(descOverrides).forEach(name=>{
@@ -1660,7 +1691,8 @@ renderCircuits();
 });
 
 // Save
-$('#btn-save').addEventListener('click',saveWorkout);
+$('#btn-save').addEventListener('click',openSaveModal);
+$('#save-confirm').addEventListener('click',saveWorkout);
 $('#btn-export-json').addEventListener('click',exportJSON);
 $('#btn-export-all').addEventListener('click',exportAllJSON);
 $('#btn-import-json').addEventListener('click',function(){$('#import-file').click()});
@@ -1705,7 +1737,8 @@ wg_saved_workouts_v1:JSON.parse(localStorage.getItem('wg_saved_workouts_v1')||'[
 wg_custom_v1:JSON.parse(localStorage.getItem('wg_custom_v1')||'[]'),
 wg_custom_eq_v1:JSON.parse(localStorage.getItem('wg_custom_eq_v1')||'[]'),
 wg_desc_overrides_v1:JSON.parse(localStorage.getItem('wg_desc_overrides_v1')||'{}'),
-wg_video_overrides_v1:JSON.parse(localStorage.getItem('wg_video_overrides_v1')||'{}')
+wg_video_overrides_v1:JSON.parse(localStorage.getItem('wg_video_overrides_v1')||'{}'),
+wg_folders_v1:JSON.parse(localStorage.getItem('wg_folders_v1')||'[]')
 };
 const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
 const a=document.createElement('a');
@@ -1732,6 +1765,7 @@ if(data.wg_custom_v1)localStorage.setItem('wg_custom_v1',JSON.stringify(data.wg_
 if(data.wg_custom_eq_v1)localStorage.setItem('wg_custom_eq_v1',JSON.stringify(data.wg_custom_eq_v1));
 if(data.wg_desc_overrides_v1)localStorage.setItem('wg_desc_overrides_v1',JSON.stringify(data.wg_desc_overrides_v1));
 if(data.wg_video_overrides_v1)localStorage.setItem('wg_video_overrides_v1',JSON.stringify(data.wg_video_overrides_v1));
+if(data.wg_folders_v1)localStorage.setItem('wg_folders_v1',JSON.stringify(data.wg_folders_v1));
 // Reload to apply everything
 alert('Backup restored! The page will now reload.');
 location.reload();
@@ -2812,11 +2846,47 @@ $('#modal-templates').classList.add('open');
 }
 
 // === SAVE / EXPORT ===
+let saveSelectedFolder='All';
+
+function openSaveModal(){
+const totalEx=circuits.reduce((a,c)=>a+c.exercises.length,0);
+if(!totalEx){alert('Add exercises first.');return}
+$('#save-name').value=$('#workout-name').value||'Untitled';
+saveSelectedFolder='All';
+// Build folder chips
+const wrap=$('#save-folder-list');
+let html='';
+allFolders().filter(f=>f!=='All').forEach(f=>{
+html+='<span class="folder-chip'+(saveSelectedFolder===f?' active':'')+'" data-folder="'+esc(f)+'">'+esc(f)+'</span>';
+});
+html+='<span class="folder-chip folder-chip-add" id="save-new-folder">+ New</span>';
+wrap.innerHTML=html;
+wrap.querySelectorAll('.folder-chip:not(.folder-chip-add)').forEach(chip=>{
+chip.addEventListener('click',function(){
+wrap.querySelectorAll('.folder-chip').forEach(c=>c.classList.remove('active'));
+this.classList.add('active');
+saveSelectedFolder=this.dataset.folder;
+});
+});
+$('#save-new-folder').addEventListener('click',function(){
+const name=prompt('New folder name:');
+if(!name||!name.trim())return;
+const fn=name.trim();
+if(allFolders().find(f=>f.toLowerCase()===fn.toLowerCase()))return;
+customFolders.push(fn);
+localStorage.setItem('wg_folders_v1',JSON.stringify(customFolders));
+saveSelectedFolder=fn;
+openSaveModal(); // re-render
+});
+$('#modal-save').classList.add('open');
+}
+
 function saveWorkout(){
-const name=$('#workout-name').value||'Untitled';
+const name=$('#save-name').value.trim()||'Untitled';
 const notes=$('#workout-notes').value||'';
 const workout={
 id:uid(),name:name,date:new Date().toISOString(),notes:notes,
+folder:saveSelectedFolder==='All'?'':saveSelectedFolder,
 settings:{rounds:$('#set-rounds').value,work:$('#set-work').value,
 rest:$('#set-rest').value,rrest:$('#set-rrest').value},
 repMode:repMode,circuits:JSON.parse(JSON.stringify(circuits))
@@ -2824,7 +2894,8 @@ repMode:repMode,circuits:JSON.parse(JSON.stringify(circuits))
 savedWorkouts.push(workout);
 localStorage.setItem('wg_saved_workouts_v1',JSON.stringify(savedWorkouts));
 updateSavedCount();
-alert('Saved "'+name+'"!');
+$('#modal-save').classList.remove('open');
+alert('Saved "'+name+'"'+(saveSelectedFolder&&saveSelectedFolder!=='All'?' to '+saveSelectedFolder:'')+'!');
 }
 
 function updateSavedCount(){
@@ -2855,21 +2926,75 @@ a.click();
 
 // === SAVED PANEL ===
 function renderSaved(){
+// Build folder tabs
+const folderWrap=$('#saved-folders');
+const folders=allFolders();
+// Count per folder
+const counts={};
+folders.forEach(f=>counts[f]=0);
+counts['All']=savedWorkouts.length;
+savedWorkouts.forEach(w=>{
+const f=w.folder||'';
+if(f&&counts[f]!==undefined)counts[f]++;
+else if(f)counts[f]=(counts[f]||0)+1; // custom folder from imported data
+});
+
+let fhtml='';
+folders.forEach(f=>{
+const cnt=f==='All'?savedWorkouts.length:counts[f]||0;
+fhtml+='<span class="folder-chip'+(activeSavedFolder===f?' active':'')+'" data-sfolder="'+esc(f)+'">'+esc(f);
+if(cnt>0)fhtml+='<span class="fcnt">'+cnt+'</span>';
+fhtml+='</span>';
+});
+fhtml+='<span class="folder-chip folder-chip-add" id="saved-add-folder">+ New</span>';
+folderWrap.innerHTML=fhtml;
+
+folderWrap.querySelectorAll('.folder-chip:not(.folder-chip-add)').forEach(chip=>{
+chip.addEventListener('click',function(){
+activeSavedFolder=this.dataset.sfolder;
+renderSaved();
+});
+});
+$('#saved-add-folder').addEventListener('click',function(){
+const name=prompt('New folder name:');
+if(!name||!name.trim())return;
+const fn=name.trim();
+if(allFolders().find(f=>f.toLowerCase()===fn.toLowerCase()))return;
+customFolders.push(fn);
+localStorage.setItem('wg_folders_v1',JSON.stringify(customFolders));
+renderSaved();
+});
+
+// Filter workouts
 const list=$('#saved-list');
-if(!savedWorkouts.length){
-list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px">No saved workouts yet.</div>';
+let filtered=savedWorkouts;
+if(activeSavedFolder!=='All'){
+filtered=savedWorkouts.filter(w=>(w.folder||'')===activeSavedFolder);
+}
+
+if(!filtered.length){
+list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px">'+(savedWorkouts.length?'No workouts in this folder.':'No saved workouts yet.')+'</div>';
 return;
 }
+
+// Sort newest first
+const sorted=[...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
+
 let html='';
-savedWorkouts.forEach((w,i)=>{
+sorted.forEach((w)=>{
+const i=savedWorkouts.indexOf(w); // real index for actions
 const d=new Date(w.date);
-const dateStr=d.toLocaleDateString()+' '+d.toLocaleTimeString();
+const dateStr=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 const exCount=w.circuits.reduce((a,c)=>a+c.exercises.length,0);
-html+='<div class="saved-card"><h3>'+esc(w.name)+'</h3>'+
+const folder=w.folder||'';
+html+='<div class="saved-card"><h3>'+esc(w.name);
+if(folder)html+='<span class="folder-tag">'+esc(folder)+'</span>';
+html+='</h3>'+
 '<div class="saved-meta">'+dateStr+' · '+w.circuits.length+' circuits · '+exCount+' exercises</div>'+
 (w.notes?'<div style="font-size:.78rem;color:var(--muted);margin:6px 0;line-height:1.4;font-style:italic">'+esc(w.notes).substring(0,150)+(w.notes.length>150?'...':'')+'</div>':'')+
 '<div class="saved-actions">'+
 '<button class="btn btn-accent btn-sm" data-sact="load" data-si="'+i+'">Load</button>'+
+'<button class="btn btn-outline btn-sm" data-sact="move" data-si="'+i+'">Move</button>'+
 '<button class="btn btn-outline btn-sm" data-sact="export" data-si="'+i+'">Export</button>'+
 '<button class="btn btn-danger btn-sm" data-sact="del" data-si="'+i+'">Delete</button>'+
 '</div></div>';
@@ -2891,12 +3016,29 @@ $('#set-rrest').value=w.settings.rrest;
 }
 circuits=JSON.parse(JSON.stringify(w.circuits));
 circuits.forEach(c=>c.exercises.forEach(e=>e.pinned=false));
-// Switch to builder tab
 $$('#nav button').forEach(b=>b.classList.remove('active'));
 $$('#nav button')[0].classList.add('active');
 $('#main').classList.add('active');
 $('#saved-panel').classList.remove('active');
 renderCircuits();
+}else if(act==='move'){
+const w=savedWorkouts[si];
+const folders=allFolders().filter(f=>f!=='All');
+const current=w.folder||'(none)';
+const choice=prompt('Move "'+w.name+'" to which folder?\nCurrent: '+current+'\n\nAvailable: '+folders.join(', ')+'\n\nType folder name (or leave blank to remove from folder):');
+if(choice===null)return; // cancelled
+const target=choice.trim();
+if(target&&!allFolders().find(f=>f.toLowerCase()===target.toLowerCase())){
+if(confirm('Create new folder "'+target+'"?')){
+customFolders.push(target);
+localStorage.setItem('wg_folders_v1',JSON.stringify(customFolders));
+}else return;
+}
+// Find matching folder name (case-insensitive)
+const matched=allFolders().find(f=>f.toLowerCase()===target.toLowerCase())||'';
+w.folder=matched==='All'?'':matched;
+localStorage.setItem('wg_saved_workouts_v1',JSON.stringify(savedWorkouts));
+renderSaved();
 }else if(act==='export'){
 const blob=new Blob([JSON.stringify(savedWorkouts[si],null,2)],{type:'application/json'});
 const a=document.createElement('a');
