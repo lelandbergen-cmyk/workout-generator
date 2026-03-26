@@ -1,0 +1,1259 @@
+{
+  "_type": "workout_architect_full_backup",
+  "_date": "2026-03-25T02:21:23.952Z",
+  "wg_saved_workouts_v1": [
+    {
+      "id": "cdzsx15n192",
+      "name": "TRX/KB/DB, No Conditioning Mvmts",
+      "date": "2026-03-08T20:34:04.694Z",
+      "settings": {
+        "rounds": "4",
+        "work": "40",
+        "rest": "20",
+        "rrest": "60"
+      },
+      "repMode": "single",
+      "circuits": [
+        {
+          "id": "cv7hja804ca",
+          "name": "Circuit 1",
+          "exercises": [
+            {
+              "id": "cz5wx8b2ch5",
+              "movement": "Deadlift",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c4rzo7a2ozu",
+              "movement": "TRX Row",
+              "equipment": "TRX",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c561khs3myk",
+              "movement": "Box Step-Up",
+              "equipment": "Plyo Box",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c0pgvut32pq",
+              "movement": "Push Up",
+              "equipment": "Bodyweight",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "ci6ek1c3wbh",
+          "name": "Circuit 2",
+          "exercises": [
+            {
+              "id": "c5f3tmu436i",
+              "movement": "Dumbbell Reverse Lunge",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cyn9snq4by1",
+              "movement": "DB Snatch",
+              "equipment": "Dumbbell",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cw73qwz5iu2",
+              "movement": "Chin Up",
+              "equipment": "Bodyweight",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cfdiqe95z4t",
+              "movement": "Dumbbell Bench Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "c7n00et60w8",
+          "name": "Circuit 3",
+          "exercises": [
+            {
+              "id": "cmzqs6x6yh2",
+              "movement": "Goblet Squat",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c6rme6oixh4",
+              "movement": "KB Swing",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cbngeabj47k",
+              "movement": "Staggered Goblet Squat",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cui2t5sjcry",
+              "movement": "KB Around the World",
+              "equipment": "Kettlebell",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        }
+      ]
+    },
+    {
+      "id": "chcin2vmisg",
+      "name": "KB/DB Endurance Workout",
+      "date": "2026-03-08T22:25:39.232Z",
+      "settings": {
+        "rounds": "4",
+        "work": "50",
+        "rest": "10",
+        "rrest": "60"
+      },
+      "repMode": "single",
+      "circuits": [
+        {
+          "id": "c70fg1gkhze",
+          "name": "Circuit 1",
+          "exercises": [
+            {
+              "id": "c0cdy65khze",
+              "movement": "Double KB Swing",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c3i6uuhkhze",
+              "movement": "Alternating Gorilla Row",
+              "equipment": "Kettlebell",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c64oai9khze",
+              "movement": "Dumbbell Incline Press",
+              "equipment": "Dumbbell",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "czkmi3ql9ph",
+              "movement": "Dumbbell Snatch",
+              "equipment": "Dumbbell",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "cdkokeikhze",
+          "name": "Circuit 2",
+          "exercises": [
+            {
+              "id": "c1n8qwekhze",
+              "movement": "Offset Reverse Lunge",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "ckfc2pekhze",
+              "movement": "Dumbbell Arnold Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "ct9r3a4khze",
+              "movement": "Dumbbell Curl",
+              "equipment": "Dumbbell",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cshqxsekhze",
+              "movement": "Kettlebell Thruster",
+              "equipment": "Kettlebell",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "cumjantkhze",
+          "name": "Circuit 3",
+          "exercises": [
+            {
+              "id": "c5jq8bskhze",
+              "movement": "Reverse Lunge",
+              "equipment": "Bodyweight",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c3c0xdakhze",
+              "movement": "KB 2-Arm Press",
+              "equipment": "Kettlebell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cufsz4ykhze",
+              "movement": "Dead Hang",
+              "equipment": "Bodyweight",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c2lky9tkhze",
+              "movement": "DB Windmill",
+              "equipment": "Dumbbell",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        }
+      ]
+    },
+    {
+      "id": "ccj2dk4gwpo",
+      "name": "Plyo Box/DB/KB - Power Hiit 3/10",
+      "date": "2026-03-15T13:27:06.396Z",
+      "settings": {
+        "rounds": "5",
+        "work": "50",
+        "rest": "10",
+        "rrest": "60"
+      },
+      "repMode": "single",
+      "circuits": [
+        {
+          "id": "cbb9kq4zgam",
+          "name": "Circuit 1",
+          "exercises": [
+            {
+              "id": "cia0duczxca",
+              "movement": "Box Step Up",
+              "equipment": "Plyo Box",
+              "category": "Squat / Lower",
+              "sets": 1,
+              "reps": 50,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Alternate step up",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "ctzplv70cxa",
+          "name": "Circuit 2",
+          "exercises": [
+            {
+              "id": "chcuzth0o22",
+              "movement": "Sprawl",
+              "equipment": "Bodyweight",
+              "category": "Conditioning",
+              "sets": 1,
+              "reps": 6,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "ccepp3c1mle",
+              "movement": "Kettlebell Swing",
+              "equipment": "Kettlebell",
+              "category": "Conditioning",
+              "sets": 1,
+              "reps": 8,
+              "repRange": "",
+              "rest": 0,
+              "notes": "repeat sequence until time is complete",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "cvf0qt422jv",
+          "name": "Circuit 3",
+          "exercises": [
+            {
+              "id": "cogd86e2tl9",
+              "movement": "Sprint Treadmill",
+              "equipment": "Bodyweight",
+              "category": "Conditioning",
+              "sets": 1,
+              "reps": 1,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Partner would run then you would, so if doing individually, identify proper format",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "cxouvhq2vj6",
+          "name": "Circuit 4",
+          "exercises": [
+            {
+              "id": "cgdjnx5409p",
+              "movement": "Dumbbell Romanian Deadlift",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 1,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Complete 1 RDL, follwoed by alternate reverse lunge, repeat ",
+              "pinned": false
+            },
+            {
+              "id": "czhz46w4tet",
+              "movement": "DB Alternating Reverse Lunge",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 1,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "c51hk6dfb7d",
+          "name": "Circuit 5",
+          "exercises": [
+            {
+              "id": "cfodancg8yg",
+              "movement": "Double DB Clean Thruster",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        }
+      ]
+    },
+    {
+      "id": "c3knuhn6ht5",
+      "name": "Power Hiit - 3/3/26 [50/40/30 secs - then complete next Circuit]",
+      "date": "2026-03-15T15:10:58.985Z",
+      "settings": {
+        "rounds": "4",
+        "work": "40",
+        "rest": "20",
+        "rrest": "60"
+      },
+      "repMode": "single",
+      "circuits": [
+        {
+          "id": "cmo76j4r032",
+          "name": "Plyo Box",
+          "exercises": [
+            {
+              "id": "csz54xnrvja",
+              "movement": "Box Jump",
+              "equipment": "Plyo Box",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cukmqdcsbas",
+              "movement": "Dumbbell Romanian Deadlift",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "ct6m1khv0jf",
+              "movement": "DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "cjlozd8v2b2",
+          "name": "Med Ball",
+          "exercises": [
+            {
+              "id": "cbsbss6wy4p",
+              "movement": "Med Ball Overhead Step-Ups",
+              "equipment": "Med Ball",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cajyrb3x6pz",
+              "movement": "Med Ball Squat Toss",
+              "equipment": "Med Ball",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c2ka9keyson",
+              "movement": "DB Pull Through",
+              "equipment": "Dumbbell",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "cwm85kqytx3",
+          "name": "Plate",
+          "exercises": [
+            {
+              "id": "c6lyxvi012s",
+              "movement": "Plate Sit Up",
+              "equipment": "Plate",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "ceuct6g0t5r",
+              "movement": "Plate Russian Twist",
+              "equipment": "Plate",
+              "category": "Carry / Core",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "chy22ik0ycg",
+              "movement": "Plate Ground to Overhead",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        },
+        {
+          "id": "ci9wfzl11nr",
+          "name": "TRX",
+          "exercises": [
+            {
+              "id": "c6zrx403qia",
+              "movement": "Alternating Gorilla Row",
+              "equipment": "Kettlebell",
+              "category": "Pull / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c5rglbo40d9",
+              "movement": "Swing",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c6azcfj6c6w",
+              "movement": "KB Seated Overhead Press",
+              "equipment": "Kettlebell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            }
+          ],
+          "override": false,
+          "oWork": 0,
+          "oRest": 0
+        }
+      ]
+    },
+    {
+      "id": "cnwl63ywr55",
+      "name": "Power Hiit - 3/17/26 - 50,50,30 secs",
+      "date": "2026-03-18T01:50:36.137Z",
+      "notes": "1 circuit, repeat 3 times: 50 secs (10 sec rest), 50 secs (10 sec rest), 30 sec (10 sec rest). 10 movements each circuit.",
+      "settings": {
+        "rounds": "4",
+        "work": "40",
+        "rest": "20",
+        "rrest": "60"
+      },
+      "repMode": "single",
+      "circuits": [
+        {
+          "id": "cqyxuxqm31g",
+          "name": "Circuit 1",
+          "exercises": [
+            {
+              "id": "c3hzd23kug4",
+              "movement": "Box Jump",
+              "equipment": "Plyo Box",
+              "category": "Squat / Lower",
+              "sets": 1,
+              "reps": 20,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c1tehcvm8pz",
+              "movement": "Alternating V-Ups",
+              "equipment": "Bodyweight",
+              "category": "Carry / Core",
+              "sets": 1,
+              "reps": 30,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cctvkpxmj9t",
+              "movement": "Sled Push",
+              "equipment": "Sled",
+              "category": "Conditioning",
+              "sets": 1,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "If no sled, do some aerobic work",
+              "pinned": false
+            },
+            {
+              "id": "cd1mmi3mr71",
+              "movement": "Plate Burpee",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cuwesewmznn",
+              "movement": "Wall Sit",
+              "equipment": "Med Ball",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c63bpparjnp",
+              "movement": "Single-Arm DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Right side - and reverse lunge, repeat",
+              "pinned": false
+            },
+            {
+              "id": "c86ker7s5av",
+              "movement": "Single-Arm DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "left side - and reverse lunge, repeat",
+              "pinned": false
+            },
+            {
+              "id": "c6faabat1ed",
+              "movement": "Dumbbell Goblet Squat",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "3 Goblet squats, 3 jumo squats",
+              "pinned": false
+            },
+            {
+              "id": "cgxon65unt4",
+              "movement": "Plate Ground to Overhead",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cjxag2bv9ap",
+              "movement": "Tricep Dip",
+              "equipment": "Bodyweight",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Perfrom on Bench",
+              "pinned": false
+            }
+          ],
+          "override": true,
+          "oWork": 50,
+          "oRest": 10,
+          "oMode": "fixed",
+          "oTotalMin": 6,
+          "oStartWork": 50,
+          "oEndWork": 30,
+          "oStep": 2,
+          "oRounds": 1
+        },
+        {
+          "id": "c58hwhsvise",
+          "name": "Circuit 2 (Same as above, 50 secs)",
+          "exercises": [
+            {
+              "id": "c3dg0mavise",
+              "movement": "Box Jump",
+              "equipment": "Plyo Box",
+              "category": "Squat / Lower",
+              "sets": 1,
+              "reps": 20,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c2sax8nvise",
+              "movement": "Alternating V-Ups",
+              "equipment": "Bodyweight",
+              "category": "Carry / Core",
+              "sets": 1,
+              "reps": 30,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cis4tmnvise",
+              "movement": "Sled Push",
+              "equipment": "Sled",
+              "category": "Conditioning",
+              "sets": 1,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "If no sled, do some aerobic work",
+              "pinned": false
+            },
+            {
+              "id": "crxccofvise",
+              "movement": "Plate Burpee",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "co14zqavise",
+              "movement": "Wall Sit",
+              "equipment": "Med Ball",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cst02livise",
+              "movement": "Single-Arm DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Right side - and reverse lunge, repeat",
+              "pinned": false
+            },
+            {
+              "id": "cz7xy8evise",
+              "movement": "Single-Arm DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "left side - and reverse lunge, repeat",
+              "pinned": false
+            },
+            {
+              "id": "c3tedh4vise",
+              "movement": "Dumbbell Goblet Squat",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "3 Goblet squats, 3 jumo squats",
+              "pinned": false
+            },
+            {
+              "id": "cfndorrvise",
+              "movement": "Plate Ground to Overhead",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c4f6oq6vise",
+              "movement": "Tricep Dip",
+              "equipment": "Bodyweight",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Perfrom on Bench",
+              "pinned": false
+            }
+          ],
+          "override": true,
+          "oWork": 50,
+          "oRest": 10,
+          "oMode": "fixed",
+          "oTotalMin": 6,
+          "oStartWork": 50,
+          "oEndWork": 30,
+          "oStep": 2,
+          "oRounds": 1
+        },
+        {
+          "id": "cjlpgbwvw4w",
+          "name": "Circuit 2 (Same as above, 50 secs) (copy)",
+          "exercises": [
+            {
+              "id": "cg32jmivw4w",
+              "movement": "Box Jump",
+              "equipment": "Plyo Box",
+              "category": "Squat / Lower",
+              "sets": 1,
+              "reps": 20,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cz7l32xvw4w",
+              "movement": "Alternating V-Ups",
+              "equipment": "Bodyweight",
+              "category": "Carry / Core",
+              "sets": 1,
+              "reps": 30,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c103no4vw4w",
+              "movement": "Sled Push",
+              "equipment": "Sled",
+              "category": "Conditioning",
+              "sets": 1,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "If no sled, do some aerobic work",
+              "pinned": false
+            },
+            {
+              "id": "ch2evzgvw4w",
+              "movement": "Plate Burpee",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cihtwnhvw4w",
+              "movement": "Wall Sit",
+              "equipment": "Med Ball",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "c3hv6rovw4w",
+              "movement": "Single-Arm DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Right side - and reverse lunge, repeat",
+              "pinned": false
+            },
+            {
+              "id": "c55ouvovw4w",
+              "movement": "Single-Arm DB Clean and Press",
+              "equipment": "Dumbbell",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "left side - and reverse lunge, repeat",
+              "pinned": false
+            },
+            {
+              "id": "c0wdz3ivw4w",
+              "movement": "Dumbbell Goblet Squat",
+              "equipment": "Dumbbell",
+              "category": "Squat / Lower",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "3 Goblet squats, 3 jumo squats",
+              "pinned": false
+            },
+            {
+              "id": "cdw2g9kvw4w",
+              "movement": "Plate Ground to Overhead",
+              "equipment": "Plate",
+              "category": "Conditioning",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "",
+              "pinned": false
+            },
+            {
+              "id": "cmd8w3lvw4w",
+              "movement": "Tricep Dip",
+              "equipment": "Bodyweight",
+              "category": "Push / Upper",
+              "sets": 3,
+              "reps": 10,
+              "repRange": "",
+              "rest": 0,
+              "notes": "Perfrom on Bench",
+              "pinned": false
+            }
+          ],
+          "override": true,
+          "oWork": 25,
+          "oRest": 10,
+          "oMode": "fixed",
+          "oTotalMin": 6,
+          "oStartWork": 50,
+          "oEndWork": 30,
+          "oStep": 2,
+          "oRounds": 1
+        }
+      ]
+    }
+  ],
+  "wg_custom_v1": [
+    {
+      "movement": "DB Alternating Reverse Lunge",
+      "equipment": "Dumbbell",
+      "category": "Squat / Lower",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Double DB Clean Thruster",
+      "equipment": "Dumbbell",
+      "category": "Squat / Lower",
+      "explanation": "• Clean dumbbells from hang to shoulders\n• Squat\n• Drive up into an overhead press (thruster)",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "DB Clean and Press",
+      "equipment": "Dumbbell",
+      "category": "Push / Upper",
+      "explanation": "The Dumbbell Clean \n\nSet Up: Position yourself so the dumbbells are in a start position that maximizes power and minimizes strain on your lower back.\nExecution: From the ground, use your legs to generate momentum to lift the dumbbells up to your shoulders.\nCatch: Receive the dumbbells in the front rack position without performing a full squat (0:09).\n2. The Press (0:14 - 0:35)\n\nMethod: You can choose to perform a strict shoulder press (all upper body) or a push press (0:17 - 0:22).\nPush Press Execution: Use momentum from your legs to drive the weight overhead (0:32 - 0:35), locking out your arms at the top.",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Med Ball Overhead Step-Ups",
+      "equipment": "Med Ball",
+      "category": "Carry / Core",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "DB Pull Through",
+      "equipment": "Dumbbell",
+      "category": "Pull / Upper",
+      "explanation": "High plan position - pull DB through",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "KB Seated Overhead Press",
+      "equipment": "Kettlebell",
+      "category": "Squat / Lower",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Alternating V-Ups",
+      "equipment": "Bodyweight",
+      "category": "Carry / Core",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Single-Arm DB Clean and Press",
+      "equipment": "Dumbbell",
+      "category": "Push / Upper",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "DB Squat Clean and Press",
+      "equipment": "Dumbbell",
+      "category": "Conditioning",
+      "explanation": "Start with feet shoulder-width, core braced, and the weight close to your body.\nHinge slightly, then explode through your hips to drive the weight up.\nPull yourself under fast and catch it at your shoulders as you drop into a squat.\nStand up strong out of the squat with your chest tall.\nFinish by pressing overhead with control, locking out fully at the top.",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Erg",
+      "equipment": "Aerobic Equipment",
+      "category": "Conditioning",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Ski Erg",
+      "equipment": "Aerobic Equipment",
+      "category": "Conditioning",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Treadmill",
+      "equipment": "Aerobic Equipment",
+      "category": "Conditioning",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    },
+    {
+      "movement": "Assault Bike",
+      "equipment": "Aerobic Equipment",
+      "category": "Conditioning",
+      "explanation": "",
+      "rating": 0,
+      "primary": "",
+      "_custom": true
+    }
+  ],
+  "wg_custom_eq_v1": [
+    "Aerobic Equipment"
+  ],
+  "wg_desc_overrides_v1": {
+    "Band 1.5 Rep Squats": "Put small band around knees. Sit back and down, keeping chest up and knees tracking over toes. Drive through your heels to return to standing. Band provides progressive resistance through the range."
+  },
+  "wg_video_overrides_v1": {}
+}
