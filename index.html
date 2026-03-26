@@ -667,8 +667,16 @@ Or:
 </div>
 </div>
 
-<div style="display:flex;gap:8px">
+<div style="display:flex;gap:8px;align-items:center">
 <button class="btn btn-accent" id="paste-parse">Parse & Build</button>
+<select id="paste-eq-hint" style="padding:5px 8px;font-size:.78rem;background:#fff;border:1px solid var(--border);border-radius:var(--radius);color:var(--text)">
+<option value="">Auto-detect equipment</option>
+<option value="Dumbbell">All Dumbbell</option>
+<option value="Kettlebell">All Kettlebell</option>
+<option value="Barbell">All Barbell</option>
+<option value="Bodyweight">All Bodyweight</option>
+<option value="Plate">All Plate</option>
+</select>
 </div>
 <div id="paste-result" style="margin-top:12px"></div>
 </div>
@@ -3386,34 +3394,142 @@ renderCircuits();
 }
 
 // === PASTE WORKOUT PARSER ===
-function parseWorkoutText(text){
-const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+function normalize(s){
+// Strip parentheticals, filler words, equipment words, then clean whitespace BEFORE depluralize
+var n=s.toLowerCase()
+.replace(/\s*\(.*?\)\s*/g,' ')
+.replace(/\b(over|with|using|on|the|a|an|each|per|side|leg|arm)\b/gi,' ')
+.replace(/\b(dumbbell|dumbbells|kettlebell|kettlebells|barbell|barbells)\b/gi,'')
+.replace(/\s+/g,' ').trim();
+// Depluralize: most specific patterns first
+n=n.replace(/ies$/,'y');               // carries→carry
+n=n.replace(/(sh|ch|x|z|ss)es$/,'$1'); // snatches→snatch, presses→press, pushes→push
+n=n.replace(/([^s])es$/,'$1e');        // lunges→lunge, burpees→burpee
+n=n.replace(/([^e])s$/,'$1');          // rows→row, makers→maker (not burpee→burpe)
+return n;
+}
+
+function scoreMatch(input,mvName){
+const a=normalize(input);
+const b=normalize(mvName);
+if(a===b)return 100;
+if(b.includes(a))return 90;
+if(a.includes(b)&&b.length>4)return 85;
+// Word overlap scoring
+const aw=a.split(/\s+/).filter(w=>w.length>2);
+const bw=b.split(/\s+/).filter(w=>w.length>2);
+if(!aw.length)return 0;
+let hits=0;
+aw.forEach(w=>{if(bw.some(bword=>bword.includes(w)||w.includes(bword)))hits++});
+const pct=hits/aw.length;
+if(pct>=1)return 80;
+if(pct>=0.6)return 60+Math.round(pct*20);
+// Check if core movement word matches (last meaningful word)
+const coreA=aw[aw.length-1];
+const coreMatch=bw.some(bword=>bword===coreA||bword.includes(coreA));
+if(coreMatch&&pct>=0.4)return 55;
+return Math.round(pct*40);
+}
+
+function findBestMatch(name,eqHint){
+const nameL=name.toLowerCase().trim();
+let best=null;
+let bestScore=0;
+
+// Try exact first
+const exact=movements.find(m=>m.movement.toLowerCase()===nameL);
+if(exact)return exact;
+
+// Try normalized exact
+const normInput=normalize(nameL);
+const exactNorm=movements.find(m=>normalize(m.movement)===normInput);
+if(exactNorm)return exactNorm;
+
+// If equipment hint provided, try to match WITHIN that equipment first
+if(eqHint){
+let eqBest=null;let eqBestScore=0;
+const eqPool=movements.filter(m=>m.equipment===eqHint);
+eqPool.forEach(m=>{
+const s=scoreMatch(nameL,m.movement);
+if(s>eqBestScore){eqBestScore=s;eqBest=m}
+});
+// Also try prefix-stripped
+const prefixes=['DB ','Dumbbell ','KB ','Kettlebell ','Barbell ','Band ','Cable ','TRX ','Med Ball ','Plate ','Landmine '];
+prefixes.forEach(pfx=>{
+eqPool.forEach(m=>{
+if(!m.movement.toLowerCase().startsWith(pfx.toLowerCase()))return;
+const stripped=m.movement.substring(pfx.length);
+const s=scoreMatch(nameL,stripped);
+if(s>eqBestScore){eqBestScore=s;eqBest=m}
+});
+});
+// If we found a decent match within the hinted equipment, use it
+if(eqBest&&eqBestScore>=45)return eqBest;
+}
+
+// Score all movements (no equipment preference)
+movements.forEach(m=>{
+const s=scoreMatch(nameL,m.movement);
+if(s>bestScore){bestScore=s;best=m}
+});
+
+// Also try with common prefixes stripped
+const prefixes=['DB ','Dumbbell ','KB ','Kettlebell ','Barbell ','Band ','Cable ','TRX ','Med Ball ','Plate ','Landmine '];
+prefixes.forEach(pfx=>{
+movements.forEach(m=>{
+if(!m.movement.toLowerCase().startsWith(pfx.toLowerCase()))return;
+const stripped=m.movement.substring(pfx.length);
+const s=scoreMatch(nameL,stripped);
+if(s>bestScore){bestScore=s;best=m}
+});
+});
+
+return bestScore>=50?best:null;
+}
+
+function parseWorkoutText(text,eqOverride){
+// Equipment hint: user override > auto-detect from text
+const textL=text.toLowerCase();
+let globalEqHint=eqOverride||null;
+if(!globalEqHint){
+if(/\b(all\s+)?dumbbell|all\s+db\b|with\s+dumbbells?\b/i.test(text))globalEqHint='Dumbbell';
+else if(/\b(all\s+)?kettlebell|all\s+kb\b|with\s+kettlebells?\b/i.test(text))globalEqHint='Kettlebell';
+else if(/\b(all\s+)?barbell|with\s+barbell\b/i.test(text))globalEqHint='Barbell';
+}
+
+// Split on newlines AND commas (for inline format like "60 snatches, 50 lunges")
+const rawLines=text.split('\n');
+const lines=[];
+rawLines.forEach(rl=>{
+if(rl.includes(',')&&/\d/.test(rl)){
+rl.split(',').forEach(p=>lines.push(p.trim()));
+}else{
+lines.push(rl.trim());
+}
+});
+
 const parsed=[];
 let circuitName='Circuit 1';
 let roundsHint=0;
 
-for(const line of lines){
-// Check for round/circuit headers
+for(const line of lines.filter(l=>l.length>0)){
 const roundMatch=line.match(/^(\d+)\s*(?:rounds?|sets?|x)\s*[:\-]?\s*$/i);
 if(roundMatch){roundsHint=parseInt(roundMatch[1]);continue}
 const roundMatch2=line.match(/^(?:for\s+)?(\d+)\s*(?:rounds?|sets?)/i);
 if(roundMatch2&&line.length<30){roundsHint=parseInt(roundMatch2[1]);continue}
 const circuitMatch=line.match(/^(?:circuit|block|round|set)\s*(\d+|[a-z])\s*[:\-]?\s*$/i);
 if(circuitMatch){circuitName='Circuit '+circuitMatch[1].toUpperCase();continue}
-// Skip pure text headers
 if(/^(?:warm.?up|cool.?down|finisher|amrap|emom|for time|rest)\s*[:\-]?\s*$/i.test(line))continue;
-if(line.length<4)continue;
+if(line.length<3)continue;
 
-// Try to extract reps + movement name
-// Patterns: "20 KB Swings", "KB Swings x 20", "KB Swings — 20 reps", "- KB Swings (20)"
 let reps=0;
 let moveName='';
 
-const pat1=line.match(/^[-•*]?\s*(\d+)\s+(.+)/); // "20 KB Swings"
-const pat2=line.match(/^[-•*]?\s*(.+?)\s*[x×]\s*(\d+)/i); // "KB Swings x 20"
-const pat3=line.match(/^[-•*]?\s*(.+?)\s*[-—]\s*(\d+)\s*(?:reps?)?/i); // "KB Swings — 20"
-const pat4=line.match(/^[-•*]?\s*(.+?)\s*\((\d+)\)/); // "KB Swings (20)"
-const pat5=line.match(/^[-•*]?\s*(.+)/); // just a name, no reps
+const pat1=line.match(/^[-•*]?\s*(\d+)\s+(.+)/);
+const pat2=line.match(/^[-•*]?\s*(.+?)\s*[x×]\s*(\d+)/i);
+const pat3=line.match(/^[-•*]?\s*(.+?)\s*[-—]\s*(\d+)\s*(?:reps?)?/i);
+const pat4=line.match(/^[-•*]?\s*(.+?)\s*\((\d+)\)/);
+const pat5=line.match(/^[-•*]?\s*(.+)/);
 
 if(pat1){reps=parseInt(pat1[1]);moveName=pat1[2]}
 else if(pat2){moveName=pat2[1];reps=parseInt(pat2[2])}
@@ -3422,25 +3538,17 @@ else if(pat4){moveName=pat4[1];reps=parseInt(pat4[2])}
 else if(pat5){moveName=pat5[1];reps=10}
 
 if(!moveName)continue;
-// Clean up
 moveName=moveName.replace(/^[-•*\s]+/,'').replace(/\s*[:\-]\s*$/,'').trim();
 if(moveName.length<3)continue;
-// Skip non-exercise lines
 if(/^(?:rest|notes?|coach|tip|scale|rx|time|cap|min|sec|repeat)/i.test(moveName))continue;
 
-// Try to match to library
-const nameL=moveName.toLowerCase();
-let match=movements.find(m=>m.movement.toLowerCase()===nameL);
-if(!match)match=movements.find(m=>m.movement.toLowerCase().includes(nameL));
-if(!match)match=movements.find(m=>nameL.includes(m.movement.toLowerCase())&&m.movement.length>5);
-// Fuzzy: split into words and check
-if(!match){
-const words=nameL.split(/\s+/).filter(w=>w.length>2);
-match=movements.find(m=>{
-const mw=m.movement.toLowerCase();
-return words.filter(w=>mw.includes(w)).length>=Math.ceil(words.length*0.6);
-});
-}
+// Detect per-line equipment hint (e.g., "DB snatches", "KB swings")
+let lineEqHint=globalEqHint;
+if(/\bDB\b|dumbbell/i.test(moveName))lineEqHint='Dumbbell';
+else if(/\bKB\b|kettlebell/i.test(moveName))lineEqHint='Kettlebell';
+else if(/\bBB\b|barbell/i.test(moveName))lineEqHint='Barbell';
+
+const match=findBestMatch(moveName,lineEqHint);
 
 parsed.push({
 name:moveName,
@@ -3526,13 +3634,23 @@ $('#paste-result').innerHTML='<div style="color:var(--rust);font-size:.82rem">OC
 function parsePastedWorkout(){
 const text=$('#paste-input').value;
 if(!text.trim()){alert('Paste some workout text first.');return}
-const result=parseWorkoutText(text);
+const eqHint=$('#paste-eq-hint').value||null;
+const result=parseWorkoutText(text,eqHint);
 if(!result.exercises.length){
 $('#paste-result').innerHTML='<div style="color:var(--rust);font-size:.82rem">Could not find any exercises in the text. Try pasting just the exercise list.</div>';
 return;
 }
 
-// Show preview
+// Store result globally so Add to Library can update it
+window._pasteResult=result;
+
+renderPasteResult();
+}
+
+function renderPasteResult(){
+const result=window._pasteResult;
+if(!result)return;
+
 let html='<div style="font-size:.82rem;margin-bottom:8px"><strong>Found '+result.exercises.length+' exercises</strong>';
 if(result.rounds)html+=' · '+result.rounds+' rounds detected';
 html+='</div>';
@@ -3540,29 +3658,65 @@ html+='</div>';
 const matched=result.exercises.filter(e=>e.matched).length;
 const unmatched=result.exercises.filter(e=>!e.matched).length;
 if(matched)html+='<div style="font-size:.75rem;color:var(--sage);margin-bottom:4px">✓ '+matched+' matched to library</div>';
-if(unmatched)html+='<div style="font-size:.75rem;color:var(--sand);margin-bottom:8px">⚠ '+unmatched+' not found (will use as-is)</div>';
+if(unmatched)html+='<div style="font-size:.75rem;color:var(--sand);margin-bottom:8px">⚠ '+unmatched+' not in library — click + to add</div>';
 
 result.exercises.forEach((ex,i)=>{
-html+='<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:.8rem;align-items:center">';
+html+='<div style="display:flex;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.8rem;align-items:center" data-pidx="'+i+'">';
 html+='<span style="font-family:DM Mono;font-size:.72rem;color:var(--accent);min-width:18px">'+(i+1)+'</span>';
 if(ex.matched){
 html+='<span class="eq-tag '+eqClass(ex.matched.equipment)+'" style="font-size:.55rem;padding:1px 5px">'+esc(ex.matched.equipment)+'</span>';
-html+='<span style="flex:1">'+esc(ex.matched.movement)+'</span>';
+html+='<span style="flex:1">'+esc(ex.matched.movement);
+if(ex.matched.movement.toLowerCase()!==ex.name.toLowerCase())html+='<span style="font-size:.68rem;color:var(--muted);margin-left:4px">← '+esc(ex.name)+'</span>';
+html+='</span>';
 }else{
-html+='<span style="flex:1;opacity:.6">'+esc(ex.name)+' <span style="font-size:.7rem;color:var(--sand)">(unmatched)</span></span>';
+html+='<span style="flex:1">'+esc(ex.name)+' <span style="font-size:.68rem;color:var(--sand)">(not in library)</span></span>';
+html+='<button class="btn btn-outline btn-sm paste-add-lib" data-pidx="'+i+'" style="padding:2px 8px;font-size:.68rem;white-space:nowrap">+ Add</button>';
 }
-html+='<span style="font-family:DM Mono;font-size:.72rem">×'+ex.reps+'</span>';
+html+='<span style="font-family:DM Mono;font-size:.72rem;min-width:32px;text-align:right">×'+ex.reps+'</span>';
 html+='</div>';
 });
 
 html+='<div style="display:flex;gap:8px;margin-top:12px">';
 html+='<button class="btn btn-accent btn-sm" id="paste-confirm">Add to Builder</button>';
+if(unmatched)html+='<button class="btn btn-outline btn-sm" id="paste-add-all-lib">+ Add All to Library</button>';
 html+='</div>';
 
 $('#paste-result').innerHTML=html;
 
+// Wire Add to Library buttons (individual)
+$$('.paste-add-lib').forEach(btn=>{
+btn.addEventListener('click',function(){
+const idx=parseInt(this.dataset.pidx);
+const ex=result.exercises[idx];
+showAddFromPaste(ex,idx);
+});
+});
+
+// Wire Add All to Library
+const addAllBtn=$('#paste-add-all-lib');
+if(addAllBtn){
+addAllBtn.addEventListener('click',function(){
+const unm=result.exercises.filter(e=>!e.matched);
+let added=0;
+unm.forEach(ex=>{
+const name=ex.name;
+if(movements.find(m=>m.movement.toLowerCase()===name.toLowerCase()))return;
+const mv={movement:name,equipment:'Bodyweight',category:'Conditioning',
+explanation:'',rating:0,primary:'',_custom:true};
+movements.push(mv);customs.push(mv);
+ex.matched=mv;
+added++;
+});
+if(added){
+localStorage.setItem('wg_custom_v1',JSON.stringify(customs));
+buildFilters();filterMvs();
+}
+renderPasteResult();
+});
+}
+
+// Wire Add to Builder
 $('#paste-confirm').addEventListener('click',function(){
-// Group by circuitName
 const groups={};
 result.exercises.forEach(ex=>{
 if(!groups[ex.circuitName])groups[ex.circuitName]=[];
@@ -3584,7 +3738,41 @@ circuits.push(c);
 
 if(result.rounds){$('#set-rounds').value=result.rounds}
 $('#modal-paste').classList.remove('open');
+window._pasteResult=null;
 renderCircuits();
+});
+}
+
+function showAddFromPaste(ex,idx){
+// Quick-add modal inline: pick equipment and category
+const eqOpts=allEquipment().map(e=>'<option value="'+esc(e)+'">'+esc(e)+'</option>').join('');
+const catOpts=CAT_LIST.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');
+const row=$$('[data-pidx="'+idx+'"]')[1]||$$('[data-pidx="'+idx+'"]')[0];
+if(!row)return;
+
+// Replace the row content with inline editor
+const name=ex.name;
+row.innerHTML='<span style="font-family:DM Mono;font-size:.72rem;color:var(--accent);min-width:18px">'+(idx+1)+'</span>'+
+'<div style="flex:1;display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+
+'<span style="font-weight:600;font-size:.8rem;margin-right:4px">'+esc(name)+'</span>'+
+'<select class="paste-eq-sel" style="padding:2px 4px;font-size:.72rem;background:#fff;border:1px solid var(--border);border-radius:4px">'+eqOpts+'</select>'+
+'<select class="paste-cat-sel" style="padding:2px 4px;font-size:.72rem;background:#fff;border:1px solid var(--border);border-radius:4px">'+catOpts+'</select>'+
+'<button class="btn btn-accent btn-sm paste-confirm-add" data-pidx="'+idx+'" style="padding:2px 8px;font-size:.68rem">✓ Save</button>'+
+'</div>'+
+'<span style="font-family:DM Mono;font-size:.72rem;min-width:32px;text-align:right">×'+ex.reps+'</span>';
+
+row.querySelector('.paste-confirm-add').addEventListener('click',function(){
+const eqVal=row.querySelector('.paste-eq-sel').value;
+const catVal=row.querySelector('.paste-cat-sel').value;
+const mv={movement:name,equipment:eqVal,category:catVal,
+explanation:'',rating:0,primary:'',_custom:true};
+movements.push(mv);customs.push(mv);
+localStorage.setItem('wg_custom_v1',JSON.stringify(customs));
+buildFilters();filterMvs();
+// Update the parse result
+const result=window._pasteResult;
+result.exercises[idx].matched=mv;
+renderPasteResult();
 });
 }
 
