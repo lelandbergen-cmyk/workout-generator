@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23F5F0EB' width='100' height='100' rx='20'/><text y='68' x='50' text-anchor='middle' font-size='40' fill='%23B85C38'>WA</text></svg>">
 <title>Workout Architect</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Jost:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -248,6 +249,16 @@ border:1px solid var(--border);background:#fff;transition:all .15s;white-space:n
 .folder-chip .fcnt{font-family:'DM Mono',monospace;font-size:.65rem;margin-left:3px;opacity:.6}
 .folder-chip-add{border-style:dashed!important;color:var(--accent)!important;opacity:.7}
 .folder-chip-add:hover{opacity:1;border-color:var(--accent)!important;background:var(--accent-dim)!important}
+.saved-card{position:relative}
+.saved-card .move-panel{display:none;margin-top:8px;padding:10px;background:var(--surface);
+border:1px solid var(--border);border-radius:var(--radius);flex-wrap:wrap;gap:4px}
+.saved-card .move-panel.open{display:flex}
+.saved-card .move-panel .move-chip{padding:4px 10px;border-radius:16px;font-size:.72rem;font-weight:500;
+cursor:pointer;border:1px solid var(--border);background:#fff;transition:all .12s}
+.saved-card .move-panel .move-chip:hover{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.saved-card .move-panel .move-chip.current{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);font-weight:600}
+.saved-card.drag-active{opacity:.5;border-style:dashed}
+.folder-chip.drop-hover{border-color:var(--accent)!important;background:var(--accent-dim)!important;color:var(--accent)!important;transform:scale(1.05)}
 .saved-card .saved-meta{font-size:.75rem;color:var(--muted);margin-bottom:10px}
 .saved-card .saved-actions{display:flex;gap:6px}
 
@@ -270,6 +281,11 @@ position:relative;border:1px solid var(--border);transition:all .2s}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;
 background:#B0A293;border-radius:50%;transition:all .2s}
 .toggle.on::after{left:20px;background:var(--accent)}
+
+/* OCR / PASTE */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+#paste-dropzone:hover,#paste-dropzone.drag-hover{border-color:var(--accent);background:var(--accent-dim)}
+#paste-dropzone.drag-hover{transform:scale(1.01)}
 
 /* PRINT */
 @media print{
@@ -405,6 +421,7 @@ html{font-size:12px}
 <button class="btn btn-outline" id="btn-clear-circuits">Clear All</button>
 <button class="btn btn-outline" id="btn-save">Save Workout</button>
 <button class="btn btn-outline" id="btn-export-json">Export JSON</button>
+<button class="btn btn-outline" id="btn-paste-workout">📋 Paste Workout</button>
 <button class="btn btn-outline" id="btn-pdf">Print / PDF</button>
 </div>
 <div id="preview-panel">
@@ -600,6 +617,60 @@ html{font-size:12px}
 <div style="display:flex;gap:8px;margin-top:16px">
 <button class="btn btn-accent" id="save-confirm">Save</button>
 </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-paste">
+<div class="modal" style="max-width:600px">
+<span class="modal-close">&times;</span>
+<h2>📋 Import a Workout</h2>
+<p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Paste text or upload a screenshot. The parser matches movement names to your library and builds the circuit automatically.</p>
+
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<button class="btn btn-outline btn-sm" id="paste-tab-text" style="font-weight:600;border-color:var(--accent);color:var(--accent)">Text</button>
+<button class="btn btn-outline btn-sm" id="paste-tab-image">📷 Screenshot</button>
+</div>
+
+<div id="paste-text-panel">
+<div class="field">
+<textarea id="paste-input" rows="10" placeholder="Paste workout text here...
+
+Example:
+3 rounds:
+20 KB Swings
+15 Goblet Squats
+10 Burpees
+200m Run
+
+Or:
+50 Wall Balls
+40 Box Jumps
+30 KB Swings
+20 Push Ups
+10 Deadlifts" style="width:100%;font-size:.85rem;line-height:1.5"></textarea>
+</div>
+</div>
+
+<div id="paste-image-panel" style="display:none">
+<div id="paste-dropzone" style="border:2px dashed var(--border);border-radius:var(--radius-lg);padding:30px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:12px">
+<div style="font-size:2rem;margin-bottom:8px">📷</div>
+<div style="font-size:.85rem;color:var(--muted)">Click to upload or drag & drop</div>
+<div style="font-size:.72rem;color:var(--muted);margin-top:4px">PNG, JPG, or screenshot from clipboard</div>
+<input type="file" id="paste-file-input" accept="image/*" style="display:none">
+</div>
+<div id="paste-image-preview" style="display:none;margin-bottom:12px;text-align:center">
+<img id="paste-preview-img" style="max-width:100%;max-height:250px;border-radius:var(--radius);border:1px solid var(--border)">
+</div>
+<div id="paste-ocr-status" style="display:none;padding:12px;text-align:center;font-size:.82rem;color:var(--muted)">
+<div id="paste-ocr-spinner" style="display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle"></div>
+<span id="paste-ocr-text">Reading image...</span>
+</div>
+</div>
+
+<div style="display:flex;gap:8px">
+<button class="btn btn-accent" id="paste-parse">Parse & Build</button>
+</div>
+<div id="paste-result" style="margin-top:12px"></div>
 </div>
 </div>
 
@@ -1451,7 +1522,7 @@ return [...set];
 }
 let savedWorkouts=JSON.parse(localStorage.getItem('wg_saved_workouts_v1')||'[]');
 
-const DEFAULT_FOLDERS=['All','Stride — Power','Stride — Power HIIT','Stride — Chipper','Strength','HIIT / Conditioning','Endurance','Custom'];
+const DEFAULT_FOLDERS=['All','Power — MyStryde','Power HIIT — MyStryde','Chipper','Strength','HIIT / Conditioning','Endurance','Custom'];
 let customFolders=JSON.parse(localStorage.getItem('wg_folders_v1')||'[]');
 let activeSavedFolder='All';
 function allFolders(){return [...DEFAULT_FOLDERS,...customFolders]}
@@ -2925,18 +2996,18 @@ a.click();
 }
 
 // === SAVED PANEL ===
+let dragSavedIdx=null;
+
 function renderSaved(){
-// Build folder tabs
 const folderWrap=$('#saved-folders');
 const folders=allFolders();
-// Count per folder
 const counts={};
 folders.forEach(f=>counts[f]=0);
 counts['All']=savedWorkouts.length;
 savedWorkouts.forEach(w=>{
 const f=w.folder||'';
 if(f&&counts[f]!==undefined)counts[f]++;
-else if(f)counts[f]=(counts[f]||0)+1; // custom folder from imported data
+else if(f)counts[f]=(counts[f]||0)+1;
 });
 
 let fhtml='';
@@ -2949,9 +3020,22 @@ fhtml+='</span>';
 fhtml+='<span class="folder-chip folder-chip-add" id="saved-add-folder">+ New</span>';
 folderWrap.innerHTML=fhtml;
 
+// Folder chips: click to filter + drop target for drag
 folderWrap.querySelectorAll('.folder-chip:not(.folder-chip-add)').forEach(chip=>{
 chip.addEventListener('click',function(){
+if(dragSavedIdx!==null)return;
 activeSavedFolder=this.dataset.sfolder;
+renderSaved();
+});
+chip.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drop-hover')});
+chip.addEventListener('dragleave',function(){this.classList.remove('drop-hover')});
+chip.addEventListener('drop',function(e){
+e.preventDefault();this.classList.remove('drop-hover');
+if(dragSavedIdx===null)return;
+const targetFolder=this.dataset.sfolder;
+savedWorkouts[dragSavedIdx].folder=targetFolder==='All'?'':targetFolder;
+localStorage.setItem('wg_saved_workouts_v1',JSON.stringify(savedWorkouts));
+dragSavedIdx=null;
 renderSaved();
 });
 });
@@ -2965,29 +3049,25 @@ localStorage.setItem('wg_folders_v1',JSON.stringify(customFolders));
 renderSaved();
 });
 
-// Filter workouts
 const list=$('#saved-list');
 let filtered=savedWorkouts;
 if(activeSavedFolder!=='All'){
 filtered=savedWorkouts.filter(w=>(w.folder||'')===activeSavedFolder);
 }
-
 if(!filtered.length){
 list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px">'+(savedWorkouts.length?'No workouts in this folder.':'No saved workouts yet.')+'</div>';
 return;
 }
 
-// Sort newest first
 const sorted=[...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
-
 let html='';
-sorted.forEach((w)=>{
-const i=savedWorkouts.indexOf(w); // real index for actions
+sorted.forEach(w=>{
+const i=savedWorkouts.indexOf(w);
 const d=new Date(w.date);
 const dateStr=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 const exCount=w.circuits.reduce((a,c)=>a+c.exercises.length,0);
 const folder=w.folder||'';
-html+='<div class="saved-card"><h3>'+esc(w.name);
+html+='<div class="saved-card" draggable="true" data-si="'+i+'"><h3>'+esc(w.name);
 if(folder)html+='<span class="folder-tag">'+esc(folder)+'</span>';
 html+='</h3>'+
 '<div class="saved-meta">'+dateStr+' · '+w.circuits.length+' circuits · '+exCount+' exercises</div>'+
@@ -2997,9 +3077,27 @@ html+='</h3>'+
 '<button class="btn btn-outline btn-sm" data-sact="move" data-si="'+i+'">Move</button>'+
 '<button class="btn btn-outline btn-sm" data-sact="export" data-si="'+i+'">Export</button>'+
 '<button class="btn btn-danger btn-sm" data-sact="del" data-si="'+i+'">Delete</button>'+
-'</div></div>';
+'</div>'+
+'<div class="move-panel" data-si="'+i+'"></div>'+
+'</div>';
 });
 list.innerHTML=html;
+
+// Drag saved cards onto folder chips
+list.querySelectorAll('.saved-card[draggable]').forEach(card=>{
+card.addEventListener('dragstart',function(e){
+dragSavedIdx=parseInt(this.dataset.si);
+this.classList.add('drag-active');
+e.dataTransfer.effectAllowed='move';
+});
+card.addEventListener('dragend',function(){
+this.classList.remove('drag-active');
+dragSavedIdx=null;
+$$('.folder-chip').forEach(c=>c.classList.remove('drop-hover'));
+});
+});
+
+// Action buttons
 list.querySelectorAll('[data-sact]').forEach(btn=>{
 btn.addEventListener('click',function(){
 const si=parseInt(this.dataset.si);
@@ -3022,23 +3120,26 @@ $('#main').classList.add('active');
 $('#saved-panel').classList.remove('active');
 renderCircuits();
 }else if(act==='move'){
+const panel=this.closest('.saved-card').querySelector('.move-panel');
+const isOpen=panel.classList.contains('open');
+$$('.move-panel').forEach(p=>{p.classList.remove('open');p.innerHTML=''});
+if(isOpen)return;
 const w=savedWorkouts[si];
-const folders=allFolders().filter(f=>f!=='All');
-const current=w.folder||'(none)';
-const choice=prompt('Move "'+w.name+'" to which folder?\nCurrent: '+current+'\n\nAvailable: '+folders.join(', ')+'\n\nType folder name (or leave blank to remove from folder):');
-if(choice===null)return; // cancelled
-const target=choice.trim();
-if(target&&!allFolders().find(f=>f.toLowerCase()===target.toLowerCase())){
-if(confirm('Create new folder "'+target+'"?')){
-customFolders.push(target);
-localStorage.setItem('wg_folders_v1',JSON.stringify(customFolders));
-}else return;
-}
-// Find matching folder name (case-insensitive)
-const matched=allFolders().find(f=>f.toLowerCase()===target.toLowerCase())||'';
-w.folder=matched==='All'?'':matched;
+const currentFolder=w.folder||'';
+let phtml='';
+allFolders().filter(f=>f!=='All').forEach(f=>{
+phtml+='<span class="move-chip'+(f===currentFolder?' current':'')+'" data-mfolder="'+esc(f)+'" data-msi="'+si+'">'+esc(f)+'</span>';
+});
+phtml+='<span class="move-chip" data-mfolder="" data-msi="'+si+'" style="opacity:.5">No folder</span>';
+panel.innerHTML=phtml;
+panel.classList.add('open');
+panel.querySelectorAll('.move-chip').forEach(chip=>{
+chip.addEventListener('click',function(){
+savedWorkouts[parseInt(this.dataset.msi)].folder=this.dataset.mfolder;
 localStorage.setItem('wg_saved_workouts_v1',JSON.stringify(savedWorkouts));
 renderSaved();
+});
+});
 }else if(act==='export'){
 const blob=new Blob([JSON.stringify(savedWorkouts[si],null,2)],{type:'application/json'});
 const a=document.createElement('a');
@@ -3284,11 +3385,248 @@ renderCircuits();
 });
 }
 
+// === PASTE WORKOUT PARSER ===
+function parseWorkoutText(text){
+const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+const parsed=[];
+let circuitName='Circuit 1';
+let roundsHint=0;
+
+for(const line of lines){
+// Check for round/circuit headers
+const roundMatch=line.match(/^(\d+)\s*(?:rounds?|sets?|x)\s*[:\-]?\s*$/i);
+if(roundMatch){roundsHint=parseInt(roundMatch[1]);continue}
+const roundMatch2=line.match(/^(?:for\s+)?(\d+)\s*(?:rounds?|sets?)/i);
+if(roundMatch2&&line.length<30){roundsHint=parseInt(roundMatch2[1]);continue}
+const circuitMatch=line.match(/^(?:circuit|block|round|set)\s*(\d+|[a-z])\s*[:\-]?\s*$/i);
+if(circuitMatch){circuitName='Circuit '+circuitMatch[1].toUpperCase();continue}
+// Skip pure text headers
+if(/^(?:warm.?up|cool.?down|finisher|amrap|emom|for time|rest)\s*[:\-]?\s*$/i.test(line))continue;
+if(line.length<4)continue;
+
+// Try to extract reps + movement name
+// Patterns: "20 KB Swings", "KB Swings x 20", "KB Swings — 20 reps", "- KB Swings (20)"
+let reps=0;
+let moveName='';
+
+const pat1=line.match(/^[-•*]?\s*(\d+)\s+(.+)/); // "20 KB Swings"
+const pat2=line.match(/^[-•*]?\s*(.+?)\s*[x×]\s*(\d+)/i); // "KB Swings x 20"
+const pat3=line.match(/^[-•*]?\s*(.+?)\s*[-—]\s*(\d+)\s*(?:reps?)?/i); // "KB Swings — 20"
+const pat4=line.match(/^[-•*]?\s*(.+?)\s*\((\d+)\)/); // "KB Swings (20)"
+const pat5=line.match(/^[-•*]?\s*(.+)/); // just a name, no reps
+
+if(pat1){reps=parseInt(pat1[1]);moveName=pat1[2]}
+else if(pat2){moveName=pat2[1];reps=parseInt(pat2[2])}
+else if(pat3){moveName=pat3[1];reps=parseInt(pat3[2])}
+else if(pat4){moveName=pat4[1];reps=parseInt(pat4[2])}
+else if(pat5){moveName=pat5[1];reps=10}
+
+if(!moveName)continue;
+// Clean up
+moveName=moveName.replace(/^[-•*\s]+/,'').replace(/\s*[:\-]\s*$/,'').trim();
+if(moveName.length<3)continue;
+// Skip non-exercise lines
+if(/^(?:rest|notes?|coach|tip|scale|rx|time|cap|min|sec|repeat)/i.test(moveName))continue;
+
+// Try to match to library
+const nameL=moveName.toLowerCase();
+let match=movements.find(m=>m.movement.toLowerCase()===nameL);
+if(!match)match=movements.find(m=>m.movement.toLowerCase().includes(nameL));
+if(!match)match=movements.find(m=>nameL.includes(m.movement.toLowerCase())&&m.movement.length>5);
+// Fuzzy: split into words and check
+if(!match){
+const words=nameL.split(/\s+/).filter(w=>w.length>2);
+match=movements.find(m=>{
+const mw=m.movement.toLowerCase();
+return words.filter(w=>mw.includes(w)).length>=Math.ceil(words.length*0.6);
+});
+}
+
+parsed.push({
+name:moveName,
+reps:reps||10,
+matched:match||null,
+circuitName:circuitName
+});
+}
+return{exercises:parsed,rounds:roundsHint};
+}
+
+let pasteMode='text'; // 'text' or 'image'
+
+function openPasteModal(){
+pasteMode='text';
+$('#paste-input').value='';
+$('#paste-result').innerHTML='';
+$('#paste-text-panel').style.display='';
+$('#paste-image-panel').style.display='none';
+$('#paste-tab-text').style.borderColor='var(--accent)';$('#paste-tab-text').style.color='var(--accent)';
+$('#paste-tab-image').style.borderColor='';$('#paste-tab-image').style.color='';
+$('#paste-image-preview').style.display='none';
+$('#paste-ocr-status').style.display='none';
+$('#modal-paste').classList.add('open');
+}
+
+function switchPasteTab(mode){
+pasteMode=mode;
+$('#paste-text-panel').style.display=mode==='text'?'':'none';
+$('#paste-image-panel').style.display=mode==='image'?'':'none';
+$('#paste-tab-text').style.borderColor=mode==='text'?'var(--accent)':'';
+$('#paste-tab-text').style.color=mode==='text'?'var(--accent)':'';
+$('#paste-tab-image').style.borderColor=mode==='image'?'var(--accent)':'';
+$('#paste-tab-image').style.color=mode==='image'?'var(--accent)':'';
+$('#paste-result').innerHTML='';
+}
+
+function handleImageFile(file){
+if(!file||!file.type.startsWith('image/'))return;
+const reader=new FileReader();
+reader.onload=function(ev){
+$('#paste-preview-img').src=ev.target.result;
+$('#paste-image-preview').style.display='';
+runOCR(ev.target.result);
+};
+reader.readAsDataURL(file);
+}
+
+function runOCR(imageData){
+$('#paste-ocr-status').style.display='';
+$('#paste-ocr-text').textContent='Loading OCR engine...';
+$('#paste-result').innerHTML='';
+
+if(typeof Tesseract==='undefined'){
+$('#paste-ocr-text').textContent='OCR library not loaded. Check your internet connection and refresh.';
+return;
+}
+
+Tesseract.recognize(imageData,'eng',{
+logger:m=>{
+if(m.status==='recognizing text'){
+const pct=Math.round((m.progress||0)*100);
+$('#paste-ocr-text').textContent='Reading image... '+pct+'%';
+}
+}
+}).then(function(result){
+$('#paste-ocr-status').style.display='none';
+const text=result.data.text||'';
+if(!text.trim()){
+$('#paste-result').innerHTML='<div style="color:var(--rust);font-size:.82rem">Could not read any text from this image. Try a clearer screenshot.</div>';
+return;
+}
+// Put OCR text into the text input and switch to text mode so user can review/edit
+$('#paste-input').value=text;
+switchPasteTab('text');
+$('#paste-result').innerHTML='<div style="font-size:.78rem;color:var(--sage);margin-bottom:8px">✓ Text extracted from image — review above, then hit Parse & Build.</div>';
+}).catch(function(err){
+$('#paste-ocr-status').style.display='none';
+$('#paste-result').innerHTML='<div style="color:var(--rust);font-size:.82rem">OCR failed: '+esc(err.message||'Unknown error')+'. Try a clearer image.</div>';
+});
+}
+
+function parsePastedWorkout(){
+const text=$('#paste-input').value;
+if(!text.trim()){alert('Paste some workout text first.');return}
+const result=parseWorkoutText(text);
+if(!result.exercises.length){
+$('#paste-result').innerHTML='<div style="color:var(--rust);font-size:.82rem">Could not find any exercises in the text. Try pasting just the exercise list.</div>';
+return;
+}
+
+// Show preview
+let html='<div style="font-size:.82rem;margin-bottom:8px"><strong>Found '+result.exercises.length+' exercises</strong>';
+if(result.rounds)html+=' · '+result.rounds+' rounds detected';
+html+='</div>';
+
+const matched=result.exercises.filter(e=>e.matched).length;
+const unmatched=result.exercises.filter(e=>!e.matched).length;
+if(matched)html+='<div style="font-size:.75rem;color:var(--sage);margin-bottom:4px">✓ '+matched+' matched to library</div>';
+if(unmatched)html+='<div style="font-size:.75rem;color:var(--sand);margin-bottom:8px">⚠ '+unmatched+' not found (will use as-is)</div>';
+
+result.exercises.forEach((ex,i)=>{
+html+='<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:.8rem;align-items:center">';
+html+='<span style="font-family:DM Mono;font-size:.72rem;color:var(--accent);min-width:18px">'+(i+1)+'</span>';
+if(ex.matched){
+html+='<span class="eq-tag '+eqClass(ex.matched.equipment)+'" style="font-size:.55rem;padding:1px 5px">'+esc(ex.matched.equipment)+'</span>';
+html+='<span style="flex:1">'+esc(ex.matched.movement)+'</span>';
+}else{
+html+='<span style="flex:1;opacity:.6">'+esc(ex.name)+' <span style="font-size:.7rem;color:var(--sand)">(unmatched)</span></span>';
+}
+html+='<span style="font-family:DM Mono;font-size:.72rem">×'+ex.reps+'</span>';
+html+='</div>';
+});
+
+html+='<div style="display:flex;gap:8px;margin-top:12px">';
+html+='<button class="btn btn-accent btn-sm" id="paste-confirm">Add to Builder</button>';
+html+='</div>';
+
+$('#paste-result').innerHTML=html;
+
+$('#paste-confirm').addEventListener('click',function(){
+// Group by circuitName
+const groups={};
+result.exercises.forEach(ex=>{
+if(!groups[ex.circuitName])groups[ex.circuitName]=[];
+groups[ex.circuitName].push(ex);
+});
+
+Object.keys(groups).forEach(cname=>{
+const c={id:uid(),name:cname,exercises:[],override:false,oWork:0,oRest:0};
+groups[cname].forEach(ex=>{
+const m=ex.matched;
+c.exercises.push({id:uid(),
+movement:m?m.movement:ex.name,
+equipment:m?m.equipment:'Bodyweight',
+category:m?m.category:'Conditioning',
+sets:1,reps:ex.reps,repRange:String(ex.reps),rest:0,notes:'',pinned:false});
+});
+circuits.push(c);
+});
+
+if(result.rounds){$('#set-rounds').value=result.rounds}
+$('#modal-paste').classList.remove('open');
+renderCircuits();
+});
+}
+
 // === BOOT ===
 document.addEventListener('DOMContentLoaded',function(){
 init();
 $('#btn-warmup').addEventListener('click',generateWarmup);
 $('#btn-burner').addEventListener('click',openBurner);
+$('#btn-paste-workout').addEventListener('click',openPasteModal);
+$('#paste-parse').addEventListener('click',parsePastedWorkout);
+
+// Paste modal tabs
+$('#paste-tab-text').addEventListener('click',function(){switchPasteTab('text')});
+$('#paste-tab-image').addEventListener('click',function(){switchPasteTab('image')});
+
+// Image upload
+$('#paste-dropzone').addEventListener('click',function(){$('#paste-file-input').click()});
+$('#paste-file-input').addEventListener('change',function(e){
+if(e.target.files[0])handleImageFile(e.target.files[0]);
+this.value='';
+});
+// Drag and drop image
+$('#paste-dropzone').addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-hover')});
+$('#paste-dropzone').addEventListener('dragleave',function(){this.classList.remove('drag-hover')});
+$('#paste-dropzone').addEventListener('drop',function(e){
+e.preventDefault();this.classList.remove('drag-hover');
+if(e.dataTransfer.files[0])handleImageFile(e.dataTransfer.files[0]);
+});
+// Clipboard paste image
+document.addEventListener('paste',function(e){
+if(!$('#modal-paste').classList.contains('open'))return;
+if(pasteMode!=='image')return;
+const items=e.clipboardData&&e.clipboardData.items;
+if(!items)return;
+for(let i=0;i<items.length;i++){
+if(items[i].type.startsWith('image/')){
+e.preventDefault();
+handleImageFile(items[i].getAsFile());
+break;
+}
+}
+});
 });
 </script>
 </body>
