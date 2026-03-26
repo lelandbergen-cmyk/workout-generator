@@ -112,20 +112,21 @@ display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:
 .eq-plate{background:rgba(176,112,48,.1);color:#B07030}
 
 /* BUILDER TOP */
-.builder-top{margin-bottom:12px}
-#workout-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;font-weight:400;letter-spacing:4px;width:100%;background:transparent;
-border:none;border-bottom:2px solid transparent;color:var(--text);padding:8px 0;margin-bottom:12px}
+.builder-top{margin-bottom:16px}
+#workout-name{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;font-weight:400;letter-spacing:5px;width:100%;background:transparent;
+border:none;border-bottom:2px solid transparent;color:var(--text);padding:10px 0 6px;margin-bottom:14px}
 #workout-name:focus{border-bottom-color:var(--accent);outline:none}
-.creation-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.btn-lg{padding:10px 22px;font-size:.9rem;font-weight:600;letter-spacing:1px}
+.creation-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+padding:14px 16px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.btn-lg{padding:11px 28px;font-size:.95rem;font-weight:600;letter-spacing:1.5px}
 
 /* SETTINGS PANEL */
 .settings-panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);
 margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
-.settings-toggle{width:100%;padding:10px 16px;display:flex;justify-content:space-between;
+.settings-toggle{width:100%;padding:12px 16px;display:flex;justify-content:space-between;
 align-items:center;background:var(--surface);cursor:pointer;border:none;font-family:'Bebas Neue',sans-serif;
-font-size:1rem;letter-spacing:2px;color:var(--text)}
-.settings-toggle:hover{background:var(--surface2)}
+font-size:1.05rem;letter-spacing:2.5px;color:var(--muted)}
+.settings-toggle:hover{background:var(--surface2);color:var(--text)}
 .settings-arrow{font-size:.7rem;color:var(--muted);transition:transform .2s}
 .settings-panel.open .settings-arrow{transform:rotate(180deg)}
 .settings-body{display:none;padding:12px 16px;border-top:1px solid var(--border)}
@@ -276,8 +277,8 @@ cursor:pointer;border:1px solid var(--border);background:#fff;transition:all .12
 /* NOTES INLINE */
 .notes-inline{margin-bottom:12px}
 .notes-placeholder{padding:10px 14px;border:1px dashed var(--border);border-radius:var(--radius);
-cursor:pointer;font-size:.85rem;color:var(--muted);transition:all .15s}
-.notes-placeholder:hover{border-color:var(--accent);color:var(--accent)}
+cursor:pointer;font-size:.82rem;color:var(--muted);transition:all .15s;background:var(--surface)}
+.notes-placeholder:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
 .notes-inline.open .notes-placeholder{display:none}
 .notes-inline.open textarea{display:block!important}
 
@@ -287,14 +288,15 @@ cursor:pointer;font-size:.85rem;color:var(--muted);transition:all .15s}
 
 /* CIRCUITS SECTION */
 .circuits-section{margin-bottom:16px}
-.circuits-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.circuits-label{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--muted)}
+.circuits-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+padding-bottom:8px;border-bottom:1px solid var(--border)}
+.circuits-label{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:4px;color:var(--muted)}
 
 /* BOTTOM BAR */
-.builder-bottom{display:flex;justify-content:space-between;align-items:center;padding:12px 0;
-border-top:1px solid var(--border);margin-bottom:60px}
+.builder-bottom{display:flex;justify-content:space-between;align-items:center;padding:14px 0;
+border-top:2px solid var(--border);margin-bottom:60px;margin-top:8px}
 .bottom-left,.bottom-right{display:flex;gap:8px;align-items:center}
-.btn-muted{opacity:.5}
+.btn-muted{opacity:.4;font-size:.78rem}
 .btn-muted:hover{opacity:1}
 
 /* PREVIEW FAB + OVERLAY */
