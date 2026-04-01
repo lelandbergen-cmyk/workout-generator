@@ -710,9 +710,17 @@ html{font-size:12px}
 <div class="field"><label>Style</label>
 <div id="burner-styles" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
 </div>
-<div class="field"><label>Equipment (uses your generate filters)</label></div>
+<div class="field"><label>Focus</label>
+<div id="burner-focus" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">
+<span class="chip active" data-bfocus="all">All</span>
+<span class="chip" data-bfocus="core">Core / Abs</span>
+<span class="chip" data-bfocus="conditioning">Conditioning</span>
+<span class="chip" data-bfocus="upper">Upper Body</span>
+<span class="chip" data-bfocus="lower">Lower Body</span>
+</div>
+</div>
 <div class="settings-row">
-<label>Exercises <input type="number" id="burner-count" value="3" min="2" max="6"></label>
+<label>Exercises <input type="number" id="burner-count" value="4" min="2" max="8"></label>
 </div>
 <div id="burner-content" style="margin-top:12px"></div>
 </div>
@@ -3738,13 +3746,11 @@ const BURNER_STYLES=[
 {id:'death',name:'Death By...',icon:'💀',desc:'Start with 1 rep. Add 1 rep every minute until you cannot complete within the minute.',work:60,rest:0,rounds:10},
 {id:'ladder',name:'Descending Ladder',icon:'📉',desc:'10-8-6-4-2 reps. Same exercises, reps shrink. Push the pace as reps drop.',work:0,rest:15,rounds:5},
 {id:'cashout',name:'Cash Out',icon:'💰',desc:'One brutal set to close the session. High reps, one or two movements, no rest until done.',work:0,rest:0,rounds:1},
-{id:'sprint',name:'Sprint Intervals',icon:'🏃',desc:'30s all-out / 30s rest × 5-8 rounds. One conditioning movement, max output.',work:30,rest:30,rounds:6},
-{id:'abblast',name:'Ab Blast',icon:'🔥',desc:'Core-only finisher. 30s work / 10s rest, cycle through 4-6 ab exercises. 2-3 rounds.',work:30,rest:10,rounds:3,abOnly:true},
-{id:'abtabata',name:'Ab Tabata',icon:'⚡',desc:'Ab-only Tabata. 20s on / 10s off × 8 rounds of pure core work. 4 minutes of pain.',work:20,rest:10,rounds:8,abOnly:true},
-{id:'abladder',name:'Ab Ladder',icon:'📉',desc:'Descending ab ladder: 20-15-10-5 reps across 4 core exercises. No rest between moves, 30s between rounds.',work:0,rest:0,rounds:1,abOnly:true}
+{id:'sprint',name:'Sprint Intervals',icon:'🏃',desc:'30s all-out / 30s rest × 5-8 rounds. One conditioning movement, max output.',work:30,rest:30,rounds:6}
 ];
 
 let selectedBurnerStyle='tabata';
+let selectedBurnerFocus='all';
 
 function openBurner(){
 // Build style chips
@@ -3763,49 +3769,55 @@ selectedBurnerStyle=this.dataset.bid;
 generateBurner();
 });
 });
+
+// Wire focus chips
+$$('#burner-focus .chip').forEach(chip=>{
+chip.addEventListener('click',function(){
+$$('#burner-focus .chip').forEach(c=>c.classList.remove('active'));
+this.classList.add('active');
+selectedBurnerFocus=this.dataset.bfocus;
+generateBurner();
+});
+// Restore active state
+chip.classList.toggle('active',chip.dataset.bfocus===selectedBurnerFocus);
+});
+
 generateBurner();
 $('#modal-burner').classList.add('open');
-// Re-generate on count change
 $('#burner-count').addEventListener('input',generateBurner);
 }
 
 function generateBurner(){
 const style=BURNER_STYLES.find(s=>s.id===selectedBurnerStyle);
 if(!style)return;
-const count=parseInt($('#burner-count').value)||3;
+const count=parseInt($('#burner-count').value)||4;
+const focus=selectedBurnerFocus;
 
-// Ab-only keyword filter for ab-focused styles
 const AB_RX=/crunch|sit.?up|v.?up|leg raise|plank|dead bug|hollow|flutter|bicycle|russian twist|windshield|toe.?to|hanging knee|reverse crunch|bird dog|superman|pike|ab wheel|rollout|mountain climber|copenhagen|l.?sit|dragon|woodchop|pallof|hip dip|side plank|plank.*tap|toe touch|scissor|heel touch|penguins|stir the pot|thread|bear hold|bear shoulder|commandos|army crawl|sprinter sit|ab bike|oblique|side crunch|side bend|cable crunch|banded crunch|around the clock/i;
 
 const eqs=lastGenEqs||allEquipment();
 let pool=movements.filter(m=>eqs.includes(m.equipment));
 
-// For ab-only styles, filter to only core/ab exercises
-if(style.abOnly){
+if(focus==='core'){
 pool=pool.filter(m=>m.category==='Carry / Core'&&AB_RX.test(m.movement));
-if(pool.length<count){
-// Expand to all core movements if not enough ab-specific
-pool=movements.filter(m=>m.category==='Carry / Core'&&eqs.includes(m.equipment));
+if(pool.length<count)pool=movements.filter(m=>m.category==='Carry / Core'&&eqs.includes(m.equipment));
+}else if(focus==='conditioning'){
+pool=pool.filter(m=>m.category==='Conditioning');
+}else if(focus==='upper'){
+pool=pool.filter(m=>m.category==='Push / Upper'||m.category==='Pull / Upper');
+}else if(focus==='lower'){
+pool=pool.filter(m=>m.category==='Squat / Lower');
 }
-}
-
-const condPool=style.abOnly?pool:pool.filter(m=>m.category==='Conditioning');
-const otherPool=style.abOnly?[]:pool.filter(m=>m.category!=='Conditioning');
+if(pool.length<count)pool=movements.filter(m=>eqs.includes(m.equipment));
 
 const picks=[];
 const used=new Set();
 circuits.forEach(c=>c.exercises.forEach(ex=>used.add(ex.movement)));
 
-if(style.abOnly){
-// For ab styles, just pick from the ab pool
-const shuffled=[...pool].sort(()=>Math.random()-0.5);
-for(const mv of shuffled){
-if(picks.length>=count)break;
-if(!used.has(mv.movement)){used.add(mv.movement);picks.push(mv)}
-}
-}else{
+if(focus==='all'||focus==='conditioning'){
+const condPool=pool.filter(m=>m.category==='Conditioning');
+const otherPool=pool.filter(m=>m.category!=='Conditioning');
 const condCount=Math.ceil(count/2);
-const otherCount=count-condCount;
 function pickFrom(p,n){
 const shuffled=[...p].sort(()=>Math.random()-0.5);
 for(const mv of shuffled){
@@ -3814,32 +3826,39 @@ if(!used.has(mv.movement)){used.add(mv.movement);picks.push(mv);n--;if(n<=0)brea
 }
 }
 pickFrom(condPool,condCount);
-pickFrom(otherPool,otherCount);
+pickFrom(otherPool,count-condCount);
 if(picks.length<count)pickFrom(pool,count-picks.length);
+}else{
+const shuffled=[...pool].sort(()=>Math.random()-0.5);
+for(const mv of shuffled){
+if(picks.length>=count)break;
+if(!used.has(mv.movement)){used.add(mv.movement);picks.push(mv)}
+}
 }
 
-// Build display
+const focusLabels={all:'',core:'Core ',conditioning:'Conditioning ',upper:'Upper Body ',lower:'Lower Body '};
+const focusLabel=focusLabels[focus]||'';
+
 let html='<div style="padding:10px 12px;background:var(--accent-dim);border-radius:var(--radius);margin-bottom:12px">';
-html+='<div style="font-size:.82rem;font-weight:600;color:var(--accent);margin-bottom:4px">'+esc(style.name)+'</div>';
+html+='<div style="font-size:.82rem;font-weight:600;color:var(--accent);margin-bottom:4px">'+esc(style.name);
+if(focusLabel)html+=' <span style="font-weight:400;opacity:.7">\u2014 '+esc(focusLabel)+'Focus</span>';
+html+='</div>';
 html+='<div style="font-size:.78rem;color:var(--muted);line-height:1.4">'+esc(style.desc)+'</div>';
 if(style.work)html+='<div style="font-family:DM Mono;font-size:.72rem;color:var(--accent);margin-top:4px">';
 if(style.work&&style.rest)html+=style.work+'s work / '+style.rest+'s rest';
-if(style.rounds>1)html+=' × '+style.rounds+' rounds';
+if(style.rounds>1)html+=' \u00d7 '+style.rounds+' rounds';
 html+='</div>';
 html+='</div>';
 
-// Exercises with format-appropriate reps
 picks.forEach((mv,i)=>{
 let reps='';
-if(selectedBurnerStyle==='tabata'||selectedBurnerStyle==='abtabata')reps='Max reps in 20s';
+if(selectedBurnerStyle==='tabata')reps='Max reps in 20s';
 else if(selectedBurnerStyle==='emom')reps=(8+Math.floor(Math.random()*5))+' reps';
 else if(selectedBurnerStyle==='amrap')reps=(8+Math.floor(Math.random()*7))+' reps';
 else if(selectedBurnerStyle==='death')reps='1, 2, 3... +1 each min';
 else if(selectedBurnerStyle==='ladder')reps='10-8-6-4-2';
 else if(selectedBurnerStyle==='cashout')reps=(20+Math.floor(Math.random()*3)*5)+' reps';
 else if(selectedBurnerStyle==='sprint')reps='30s all-out';
-else if(selectedBurnerStyle==='abblast')reps='30s work';
-else if(selectedBurnerStyle==='abladder')reps='20-15-10-5';
 
 html+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start">';
 html+='<span style="font-family:DM Mono;font-size:.75rem;color:var(--accent);min-width:20px">'+(i+1)+'</span>';
@@ -3848,25 +3867,23 @@ html+='<div style="font-size:.75rem;color:var(--muted)"><span class="eq-tag '+eq
 });
 
 html+='<div style="margin-top:16px;display:flex;gap:8px">';
-html+='<button class="btn btn-accent btn-sm" id="burner-regen">🔀 Regenerate</button>';
+html+='<button class="btn btn-accent btn-sm" id="burner-regen">\ud83d\udd00 Regenerate</button>';
 html+='<button class="btn btn-outline btn-sm" id="burner-add">+ Add as Circuit</button></div>';
 
 $('#burner-content').innerHTML=html;
 
 $('#burner-regen').addEventListener('click',generateBurner);
 $('#burner-add').addEventListener('click',function(){
-const c={id:uid(),name:'💀 '+style.name+' Finisher',exercises:[],override:true,
+const c={id:uid(),name:'\ud83d\udc80 '+focusLabel+style.name,exercises:[],override:true,
 oWork:style.work||30,oRest:style.rest||0,oRounds:style.rounds||1,oMode:'fixed'};
 picks.forEach(mv=>{
 let reps=10;
-if(selectedBurnerStyle==='tabata'||selectedBurnerStyle==='abtabata')reps=1;
+if(selectedBurnerStyle==='tabata')reps=1;
 else if(selectedBurnerStyle==='cashout')reps=20+Math.floor(Math.random()*3)*5;
 else if(selectedBurnerStyle==='ladder')reps=10;
-else if(selectedBurnerStyle==='abblast')reps=1;
-else if(selectedBurnerStyle==='abladder')reps=20;
 else reps=8+Math.floor(Math.random()*5);
 c.exercises.push({id:uid(),movement:mv.movement,equipment:mv.equipment,category:mv.category,
-sets:1,reps:reps,repRange:selectedBurnerStyle==='ladder'?'10-8-6-4-2':(selectedBurnerStyle==='abladder'?'20-15-10-5':(selectedBurnerStyle==='death'?'+1/min':(selectedBurnerStyle==='sprint'?'30s':(selectedBurnerStyle==='abblast'||selectedBurnerStyle==='abtabata'?'30s':String(reps))))),
+sets:1,reps:reps,repRange:selectedBurnerStyle==='ladder'?'10-8-6-4-2':(selectedBurnerStyle==='death'?'+1/min':(selectedBurnerStyle==='sprint'?'30s':String(reps))),
 rest:0,notes:'',pinned:false});
 });
 circuits.push(c);
