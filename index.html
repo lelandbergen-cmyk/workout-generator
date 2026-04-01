@@ -178,6 +178,17 @@ text-overflow:ellipsis;white-space:nowrap;cursor:pointer;transition:color .15s}
 font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
 .ex-row input[type="number"],.ex-row input[type="text"]{width:45px;padding:3px 4px;font-size:.78rem}
 .ex-row .ex-rest-input{width:40px}
+
+/* SUBSTITUTION PANEL */
+.subs-panel{padding:8px 12px 12px 28px;background:var(--surface);border-top:1px dashed var(--border);
+font-size:.78rem;line-height:1.5}
+.subs-panel .subs-group{margin-bottom:10px}
+.subs-panel .subs-group-title{font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.5px;
+color:var(--muted);margin-bottom:4px}
+.subs-panel .subs-item{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;margin:2px 4px 2px 0;
+border-radius:16px;background:#fff;border:1px solid var(--border);cursor:pointer;transition:all .12s;font-size:.74rem}
+.subs-panel .subs-item:hover{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.subs-panel .subs-item .eq-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .ex-row .ex-notes{width:80px;font-size:.75rem;padding:3px 5px}
 .ex-row .pin-btn{font-size:.85rem;padding:2px 4px;transition:all .15s;border-radius:4px}
 .ex-row .pin-btn.pinned{color:var(--accent)}
@@ -2297,9 +2308,11 @@ html+='<input type="text" value="'+esc(ex.repRange||ex.reps||'')+'" data-field="
 html+='<input type="number" class="ex-rest-input" value="'+(ex.rest||0)+'" data-field="exrest" data-ci="'+ci+'" data-ei="'+ei+'" min="0" step="5" title="Rest (s)">';
 html+='<input type="text" class="ex-notes" value="'+esc(ex.notes||'')+'" data-field="notes" data-ci="'+ci+'" data-ei="'+ei+'" placeholder="Notes">';
 html+='<button class="pin-btn'+(ex.pinned?' pinned':'')+'" data-act="pin" data-ci="'+ci+'" data-ei="'+ei+'" title="Pin">'+(ex.pinned?'📌':'📍')+'</button>';
-html+='<button class="reroll-btn" data-act="reroll" data-ci="'+ci+'" data-ei="'+ei+'" title="Swap for smart suggestion">🔀</button>';
+html+='<button class="reroll-btn" data-act="reroll" data-ci="'+ci+'" data-ei="'+ei+'" title="Random swap">🔀</button>';
+html+='<button class="reroll-btn" data-act="subs" data-ci="'+ci+'" data-ei="'+ei+'" title="Find substitutions">↔</button>';
 html+='<button class="del-btn" data-act="delex" data-ci="'+ci+'" data-ei="'+ei+'" title="Remove">✕</button>';
 html+='</div>';
+html+='<div class="subs-panel" id="subs-'+ci+'-'+ei+'" style="display:none"></div>';
 });
 html+='</div>';
 html+='<div class="circuit-footer"><button class="btn btn-sm btn-outline" data-act="addex" data-ci="'+ci+'">+ Add Exercise</button></div>';
@@ -2389,11 +2402,21 @@ circuits[ci].exercises[ei].pinned=!circuits[ci].exercises[ei].pinned;
 renderCircuits();
 }else if(act==='reroll'){
 const old=circuits[ci].exercises[ei];
-if(old.pinned)return; // don't reroll pinned
+if(old.pinned)return;
 const mv=smartPick(ci,old.movement);
 if(mv){
 old.movement=mv.movement;old.equipment=mv.equipment;old.category=mv.category;
 renderCircuits();
+}
+}else if(act==='subs'){
+const panel=$('#subs-'+ci+'-'+ei);
+if(panel.style.display==='none'){
+// Close any other open panels
+$$('.subs-panel').forEach(p=>p.style.display='none');
+showSubstitutions(ci,ei,panel);
+panel.style.display='';
+}else{
+panel.style.display='none';
 }
 }else if(act==='delex'){
 circuits[ci].exercises.splice(ei,1);renderCircuits();
@@ -2533,6 +2556,134 @@ renderCircuits();
 }
 
 // === TIME CALC ===
+
+// Movement pattern extraction for substitutions
+const MOVE_PATTERNS=[
+{name:'Squat',rx:/squat|pistol|zercher/i},
+{name:'Lunge',rx:/lunge|split squat|bulgarian|cossack|curtsy|step.?through/i},
+{name:'Hinge',rx:/deadlift|rdl|romanian|good morning|stiff.?leg|hip thrust|glute bridge|hinge/i},
+{name:'Press',rx:/press|push.?up|pushup|dip|jm press/i},
+{name:'Row',rx:/row|renegade|gorilla|seal row|pendlay|yates/i},
+{name:'Pull',rx:/pull.?up|chin.?up|lat pull|muscle.?up|pullover/i},
+{name:'Curl',rx:/curl|bicep|hammer curl|spider curl|preacher/i},
+{name:'Extension',rx:/extension|tricep|kickback|pushdown|skull crush/i},
+{name:'Fly',rx:/fly|chest fly|pec|lateral raise|front raise|rear delt/i},
+{name:'Carry',rx:/carry|walk|farmer|suitcase|waiter/i},
+{name:'Swing',rx:/swing/i},
+{name:'Clean',rx:/clean(?!.*jerk)|snatch(?!.*grip)/i},
+{name:'Throw/Slam',rx:/slam|throw|toss|wall ball/i},
+{name:'Plank',rx:/plank|hollow|dead bug|bird dog|pallof/i},
+{name:'Crunch/Situp',rx:/crunch|sit.?up|v.?up|leg raise|toes to|windshield|russian twist/i},
+{name:'Jump',rx:/jump|hop|bound|box jump|depth|pogo|broad/i},
+{name:'Burpee',rx:/burpee|sprawl/i},
+{name:'Crawl',rx:/crawl|bear|inchworm/i},
+{name:'Sprint',rx:/sprint|run|bike|row.*erg|ski|shuttle/i}
+];
+
+function getPatterns(name){
+return MOVE_PATTERNS.filter(p=>p.rx.test(name)).map(p=>p.name);
+}
+
+function showSubstitutions(ci,ei,panel){
+const ex=circuits[ci].exercises[ei];
+const mvData=movements.find(m=>m.movement===ex.movement);
+if(!mvData)return;
+
+const exPatterns=getPatterns(ex.movement);
+const usedNames=new Set();
+circuits.forEach(c=>c.exercises.forEach(e=>usedNames.add(e.movement)));
+
+// Group 1: Same pattern, different equipment
+const samePattern=[];
+if(exPatterns.length){
+movements.forEach(m=>{
+if(m.movement===ex.movement)return;
+if(usedNames.has(m.movement))return;
+if(m.equipment===ex.equipment)return; // want different equipment
+const mp=getPatterns(m.movement);
+const overlap=mp.filter(p=>exPatterns.includes(p));
+if(overlap.length>0)samePattern.push(m);
+});
+}
+
+// Group 2: Same equipment, same category (different pattern or no pattern overlap)
+const sameEquipCat=[];
+movements.forEach(m=>{
+if(m.movement===ex.movement)return;
+if(usedNames.has(m.movement))return;
+if(samePattern.includes(m))return;
+if(m.equipment===ex.equipment&&m.category===ex.category)sameEquipCat.push(m);
+});
+
+// Group 3: Same category, different equipment, different pattern
+const sameCat=[];
+movements.forEach(m=>{
+if(m.movement===ex.movement)return;
+if(usedNames.has(m.movement))return;
+if(samePattern.includes(m)||sameEquipCat.includes(m))return;
+if(m.category===ex.category)sameCat.push(m);
+});
+
+// Shuffle and limit each group
+function shuffleTake(arr,n){return arr.sort(()=>Math.random()-0.5).slice(0,n)}
+const g1=shuffleTake(samePattern,8);
+const g2=shuffleTake(sameEquipCat,6);
+const g3=shuffleTake(sameCat,6);
+
+const eqColors={'Kettlebell':'#4A7C59','Dumbbell':'#5B718F','Barbell':'#8B6D55','Bodyweight':'#6B7A3A',
+'Band':'#8B6B8A','Cable':'#5B7A8F','TRX':'#B07030','Plyo Box':'#7A5B3A','Med Ball':'#6B5D52',
+'Landmine':'#5B8B70','Sled':'#8B7A40','Trap Bar':'#5B6B90','Plate':'#B07030'};
+
+function renderGroup(title,items){
+if(!items.length)return '';
+let h='<div class="subs-group"><div class="subs-group-title">'+title+'</div><div>';
+items.forEach(m=>{
+const col=eqColors[m.equipment]||'var(--muted)';
+h+='<span class="subs-item" data-sub="'+esc(m.movement)+'" data-sci="'+ci+'" data-sei="'+ei+'">';
+h+='<span class="eq-dot" style="background:'+col+'"></span>';
+h+=esc(m.movement);
+h+='<span style="opacity:.5;font-size:.65rem;margin-left:2px">'+esc(m.equipment)+'</span>';
+h+='</span>';
+});
+h+='</div></div>';
+return h;
+}
+
+let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+html+='<span style="font-weight:600;color:var(--accent);font-size:.78rem">Substitutions for '+esc(ex.movement)+'</span>';
+html+='<button class="btn btn-outline btn-sm" style="padding:1px 8px;font-size:.65rem" data-act="subs" data-ci="'+ci+'" data-ei="'+ei+'">✕</button>';
+html+='</div>';
+
+if(exPatterns.length){
+html+=renderGroup('Same movement, different equipment',g1);
+}
+html+=renderGroup('Same equipment & category',g2);
+html+=renderGroup('Same category, different equipment',g3);
+
+if(!g1.length&&!g2.length&&!g3.length){
+html+='<div style="color:var(--muted);padding:8px 0">No substitutions found — try adding more equipment in your library.</div>';
+}
+
+panel.innerHTML=html;
+
+// Wire click-to-swap
+panel.querySelectorAll('.subs-item').forEach(item=>{
+item.addEventListener('click',function(){
+const subName=this.dataset.sub;
+const sci=parseInt(this.dataset.sci);
+const sei=parseInt(this.dataset.sei);
+const mv=movements.find(m=>m.movement===subName);
+if(!mv)return;
+const target=circuits[sci].exercises[sei];
+target.movement=mv.movement;
+target.equipment=mv.equipment;
+target.category=mv.category;
+renderCircuits();
+});
+});
+}
+
+
 function calcTime(){
 const globalRounds=parseInt($('#set-rounds').value)||1;
 const globalWork=parseInt($('#set-work').value)||0;
@@ -2615,18 +2766,18 @@ pc.innerHTML=html;
 // === GENERATE ===
 // === WORKOUT FORMATS ===
 const FORMATS=[
-{id:'circuit',name:'Circuit',icon:'🔄',desc:'Standard rounds: repeat each circuit for the set number of rounds with fixed work/rest.',work:40,rest:20,rounds:4,rrest:60},
-{id:'tabata',name:'Tabata',icon:'⚡',desc:'Classic 20s on / 10s off for 8 rounds. Maximum intensity in minimal time.',work:20,rest:10,rounds:8,rrest:60},
-{id:'emom',name:'EMOM',icon:'⏱',desc:'Every Minute on the Minute. Complete reps at the start of each minute, rest the remainder.',work:60,rest:0,rounds:10,rrest:0},
-{id:'amrap',name:'AMRAP',icon:'♾',desc:'As Many Rounds As Possible within the time cap. Keep moving, count your rounds.',work:45,rest:15,rounds:5,rrest:60},
-{id:'descend',name:'Descending',icon:'📉',desc:'Each round gets shorter — start strong, push harder as time drops. E.g. 50s → 40s → 30s per movement, new circuit each tier.',work:50,rest:15,rounds:3,rrest:60},
-{id:'ascend',name:'Ascending',icon:'📈',desc:'Each round gets longer — build into the effort. E.g. 20s → 30s → 40s per movement.',work:20,rest:15,rounds:3,rrest:60},
-{id:'ladder',name:'Ladder',icon:'🪜',desc:'Reps climb up or down each round. Classic 21-15-9, 10-to-1, or custom schemes.',work:30,rest:30,rounds:6,rrest:60},
-{id:'chipper',name:'Chipper',icon:'🪓',desc:'One long circuit — chip through every exercise once with high reps. No repeated rounds.',work:0,rest:0,rounds:1,rrest:0},
-{id:'hwpo',name:'HWPO MetCon',icon:'🏋',desc:'HWPO-style: alternating EMOM blocks with AMRAP finishers. Strength meets conditioning.',work:60,rest:0,rounds:5,rrest:90},
-{id:'endurance',name:'Endurance',icon:'🫁',desc:'Long work intervals, short rest. Build sustained output and mental toughness.',work:50,rest:10,rounds:4,rrest:60},
-{id:'strength',name:'Strength',icon:'💪',desc:'Compounds first (squats, deadlifts, presses), then accessories. Heavier loading, longer rest, lower reps on the big lifts, moderate reps on isolation work.',work:40,rest:60,rounds:4,rrest:90},
-{id:'2on1off',name:'2-on-1-off',icon:'🔁',desc:'Two exercises back-to-back, then rest. Superset-style training for density.',work:30,rest:0,rounds:5,rrest:45}
+{id:'circuit',name:'Circuit',icon:'🔄',desc:'Standard rounds: 2-3 circuits of 4-6 exercises each. Repeat each circuit for the set number of rounds with fixed work/rest.',work:40,rest:20,rounds:4,rrest:60},
+{id:'tabata',name:'Tabata',icon:'⚡',desc:'1 circuit of 4 exercises. Classic 20s on / 10s off for 8 rounds — cycle through all exercises twice.',work:20,rest:10,rounds:8,rrest:60},
+{id:'emom',name:'EMOM',icon:'⏱',desc:'1 circuit of 3-5 exercises. Rotate through one exercise per minute — complete reps, rest the remainder.',work:60,rest:0,rounds:10,rrest:0},
+{id:'amrap',name:'AMRAP',icon:'♾',desc:'1 circuit of 4-5 exercises. As Many Rounds As Possible — keep cycling through the list within the time cap.',work:45,rest:15,rounds:5,rrest:60},
+{id:'descend',name:'Descending',icon:'📉',desc:'1 circuit of 5 exercises. Work intervals shrink each round (50s → 40s → 30s). Push harder as time drops.',work:50,rest:15,rounds:3,rrest:60},
+{id:'ascend',name:'Ascending',icon:'📈',desc:'1 circuit of 5 exercises. Work intervals grow each round (20s → 30s → 40s). Build into the effort.',work:20,rest:15,rounds:3,rrest:60},
+{id:'ladder',name:'Ladder',icon:'🪜',desc:'1 circuit of 3 exercises. Reps drop each round — classic 21-15-9 structure. Fast, brutal, done.',work:30,rest:30,rounds:6,rrest:60},
+{id:'chipper',name:'Chipper',icon:'🪓',desc:'1 long circuit of 6-8 exercises. Chip through every exercise once with high descending reps (50-40-30-20-10). No repeated rounds.',work:0,rest:0,rounds:1,rrest:0},
+{id:'hwpo',name:'HWPO MetCon',icon:'🏋',desc:'2 circuits: alternating EMOM blocks with an AMRAP finisher. Strength meets conditioning.',work:60,rest:0,rounds:5,rrest:90},
+{id:'endurance',name:'Endurance',icon:'🫁',desc:'1 circuit of 5-6 exercises. Long work intervals, short rest. Build sustained output and mental toughness.',work:50,rest:10,rounds:4,rrest:60},
+{id:'strength',name:'Strength',icon:'💪',desc:'2-3 blocks of 4 exercises. Compounds first (squats, deadlifts, presses at 4×3-5), then accessories (3×8-12). Heavy loading, longer rest.',work:40,rest:60,rounds:4,rrest:90},
+{id:'2on1off',name:'2-on-1-off',icon:'🔁',desc:'3 supersets of 2 exercises each. Two exercises back-to-back, then rest. High-density training.',work:30,rest:0,rounds:5,rrest:45}
 ];
 
 const TIMING_MODES=[
@@ -2669,6 +2820,7 @@ chip.addEventListener('click',function(){
 fmtWrap.querySelectorAll('.gen-fmt-chip').forEach(c=>c.classList.remove('active'));
 this.classList.add('active');
 selectedFormat=this.dataset.fid;
+applyFormatDefaults(selectedFormat);
 updateFormatDesc();
 updateTimingVisibility();
 });
@@ -2698,6 +2850,7 @@ if(el)el.addEventListener('input',updateTimingPreview);
 });
 
 updateFormatDesc();
+applyFormatDefaults(selectedFormat);
 updateTimingVisibility();
 updateTimingPreview();
 
@@ -2705,6 +2858,28 @@ updateTimingPreview();
 const pinned=circuits.reduce((a,c)=>a+c.exercises.filter(e=>e.pinned).length,0);
 $('#gen-pin-count').textContent='('+pinned+' pinned)';
 $('#modal-generate').classList.add('open');
+}
+
+function applyFormatDefaults(fmt){
+const defaults={
+circuit:    {circuits:3, exper:5},
+tabata:     {circuits:1, exper:4},
+emom:       {circuits:1, exper:4},
+amrap:      {circuits:1, exper:5},
+descend:    {circuits:1, exper:5},
+ascend:     {circuits:1, exper:5},
+ladder:     {circuits:1, exper:3},
+chipper:    {circuits:1, exper:7},
+hwpo:       {circuits:2, exper:4},
+endurance:  {circuits:1, exper:5},
+strength:   {circuits:3, exper:4},
+'2on1off':  {circuits:3, exper:2}
+};
+const d=defaults[fmt];
+if(d){
+$('#gen-circuits').value=d.circuits;
+$('#gen-exper').value=d.exper;
+}
 }
 
 function updateFormatDesc(){
@@ -2845,11 +3020,17 @@ circuits.push(c);
 $('#workout-name').value=(selectedFormat==='descend'?'Descending':'Ascending')+' Ladder Workout';
 $('#set-rounds').value=1;
 } else if(selectedFormat==='chipper'){
-// One big circuit with lots of exercises
+// One big circuit with descending reps (50-40-30-20-10 style)
 const chipExCount=Math.max(exPer,6);
 const c=buildCircuitFromPool(pool,chipExCount,usedGlobal,focus,0,1);
 c.name='The Chipper';
-c.exercises.forEach(ex=>{ex.reps=20;ex.repRange='15-20';ex.sets=1});
+// Descending reps based on exercise count
+const repStart=chipExCount>=7?60:50;
+const repStep=chipExCount>=7?Math.floor(50/(chipExCount-1)):10;
+c.exercises.forEach((ex,i)=>{
+const r=Math.max(10,repStart-i*repStep);
+ex.reps=r;ex.repRange=String(r);ex.sets=1;
+});
 circuits.push(c);
 $('#workout-name').value='Chipper Workout';
 $('#set-rounds').value=1;
@@ -2949,6 +3130,94 @@ c.exercises.forEach(ex=>{ex.reps=12;ex.repRange='10-15'});
 circuits.push(c);
 }
 $('#workout-name').value='Superset Workout';
+} else if(selectedFormat==='emom'){
+// EMOM: 1 circuit, each exercise gets its own minute
+const c={id:uid(),name:'EMOM — '+exPer+' Min',exercises:[],override:true,oWork:60,oRest:0,oRounds:Math.ceil(10/exPer),oMode:'fixed'};
+const catPool=[...CAT_LIST];
+for(let j=0;j<exPer;j++){
+const targetCat=focus==='all'?catPool[j%catPool.length]:focus;
+let cands=pool.filter(m=>m.category===targetCat&&!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool;
+const pick=cands[Math.floor(Math.random()*cands.length)];
+usedGlobal.add(pick.movement);
+const reps=8+Math.floor(Math.random()*7); // 8-14 reps
+c.exercises.push({id:uid(),movement:pick.movement,equipment:pick.equipment,
+category:pick.category,sets:1,reps:reps,repRange:String(reps),rest:0,
+notes:'Min '+(j+1),pinned:false});
+}
+circuits.push(c);
+$('#workout-name').value=exPer+'-Min EMOM';
+$('#set-rounds').value=Math.ceil(10/exPer);$('#set-rrest').value=0;
+
+} else if(selectedFormat==='tabata'){
+// Tabata: 1 circuit, 4 exercises, 20s on / 10s off × 8 rounds (2 per exercise)
+const c={id:uid(),name:'Tabata — 4 Min',exercises:[],override:true,oWork:20,oRest:10,oRounds:8,oMode:'fixed'};
+const catPool=[...CAT_LIST];
+for(let j=0;j<exPer;j++){
+const targetCat=focus==='all'?catPool[j%catPool.length]:focus;
+let cands=pool.filter(m=>m.category===targetCat&&!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool;
+const pick=cands[Math.floor(Math.random()*cands.length)];
+usedGlobal.add(pick.movement);
+c.exercises.push({id:uid(),movement:pick.movement,equipment:pick.equipment,
+category:pick.category,sets:1,reps:1,repRange:'Max',rest:0,
+notes:'20s max effort',pinned:false});
+}
+circuits.push(c);
+$('#workout-name').value='Tabata';
+$('#set-rounds').value=8;$('#set-work').value=20;$('#set-rest').value=10;$('#set-rrest').value=60;
+
+} else if(selectedFormat==='amrap'){
+// AMRAP: 1 circuit, moderate reps, keep cycling
+const c={id:uid(),name:'AMRAP',exercises:[],override:false,oWork:0,oRest:0};
+const catPool=[...CAT_LIST];
+for(let j=0;j<exPer;j++){
+const targetCat=focus==='all'?catPool[j%catPool.length]:focus;
+let cands=pool.filter(m=>m.category===targetCat&&!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool;
+const pick=cands[Math.floor(Math.random()*cands.length)];
+usedGlobal.add(pick.movement);
+const reps=[10,12,15,20][Math.floor(Math.random()*4)];
+c.exercises.push({id:uid(),movement:pick.movement,equipment:pick.equipment,
+category:pick.category,sets:1,reps:reps,repRange:String(reps),rest:0,
+notes:'',pinned:false});
+}
+circuits.push(c);
+const timeCap=[8,10,12,15][Math.floor(Math.random()*4)];
+$('#workout-name').value=timeCap+'-Min AMRAP';
+$('#set-rounds').value=1;$('#set-rrest').value=0;
+
+} else if(selectedFormat==='endurance'){
+// Endurance: 1 circuit, longer work, lower rest, moderate-high reps
+const c={id:uid(),name:'Endurance Circuit',exercises:[],override:true,oWork:50,oRest:10,oRounds:4,oMode:'fixed'};
+const catPool=[...CAT_LIST];
+for(let j=0;j<exPer;j++){
+const targetCat=focus==='all'?catPool[j%catPool.length]:focus;
+let cands=pool.filter(m=>m.category===targetCat&&!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool.filter(m=>!usedGlobal.has(m.movement));
+if(!cands.length)cands=pool;
+const pick=cands[Math.floor(Math.random()*cands.length)];
+usedGlobal.add(pick.movement);
+c.exercises.push({id:uid(),movement:pick.movement,equipment:pick.equipment,
+category:pick.category,sets:1,reps:15,repRange:'12-20',rest:0,
+notes:'50s sustained',pinned:false});
+}
+circuits.push(c);
+$('#workout-name').value='Endurance Grind';
+$('#set-rounds').value=4;$('#set-rrest').value=60;
+
+} else if(selectedFormat==='circuit'){
+// Standard circuit: proper multi-circuit with naming
+for(let i=0;i<numCircuits;i++){
+const c=buildCircuitFromPool(pool,exPer,usedGlobal,focus,i,numCircuits);
+c.name='Circuit '+(i+1);
+circuits.push(c);
+}
+$('#workout-name').value=numCircuits+'-Circuit Workout';
+
 } else if(selectedTiming!=='fixed'){
 // Any format with variable timing
 const seq=getTimingSequence(numCircuits);
